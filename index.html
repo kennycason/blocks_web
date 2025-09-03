@@ -18,13 +18,13 @@
             overflow: hidden;
         }
 
-        .game-container {
+        .main-content {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
+            min-height: calc(100vh - 160px);
             gap: 20px;
-            padding-top: 80px;
+            padding: 80px 20px 20px;
         }
 
         .game-board {
@@ -33,19 +33,45 @@
             position: relative;
         }
 
-        .sidebar {
+        .left-sidebar {
             display: flex;
             flex-direction: column;
             gap: 20px;
             width: 200px;
-        }
-
-        .left-sidebar {
-            align-items: flex-start;
+            align-items: flex-end;
         }
 
         .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 240px;
             align-items: flex-start;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-top: 2px solid #fff;
+            z-index: 1000;
+        }
+
+        .hiscores-section {
+            flex: 1;
+            max-width: 50%;
+        }
+
+        .controls-section {
+            flex: 1;
+            max-width: 50%;
+            text-align: right;
         }
 
         .info-panel {
@@ -53,6 +79,7 @@
             border: 2px solid #fff;
             border-radius: 10px;
             padding: 15px;
+            width: 150px;
         }
 
         .info-panel h3 {
@@ -66,6 +93,7 @@
             color: #fff;
             font-size: 16px;
             margin-bottom: 5px;
+            text-align: center;
         }
 
         .next-piece {
@@ -78,12 +106,27 @@
         }
 
         .controls {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #fff;
-            border-radius: 10px;
-            padding: 15px;
             font-size: 12px;
             line-height: 1.4;
+            color: #fff;
+        }
+
+        .controls h3 {
+            color: #ffff00;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .hiscores {
+            font-size: 12px;
+            line-height: 1.4;
+            color: #fff;
+        }
+
+        .hiscores h3 {
+            color: #ffff00;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
 
         .histogram {
@@ -261,29 +304,13 @@
         </div>
     </div>
 
-    <div class="game-container">
-        <div class="sidebar left-sidebar">
-            <div class="controls">
-                <h3 style="color: #ffff00; margin-bottom: 10px;">CONTROLS</h3>
-                <div><strong>↑/W</strong> - Pause</div>
-                <div><strong>←→/AD</strong> - Move piece</div>
-                <div><strong>↓/S</strong> - Fast drop</div>
-                <div><strong>X</strong> - Rotate left</div>
-                <div><strong>C</strong> - Rotate right</div>
-                <div><strong>R</strong> - Reset game</div>
-                <div><strong>ESC</strong> - Exit/Menu</div>
-            </div>
-            
+    <div class="main-content">
+        <div class="left-sidebar">            
             <div class="info-panel">
                 <h3>NEXT</h3>
                 <div class="next-piece">
                     <canvas id="nextPieceCanvas" width="120" height="80"></canvas>
                 </div>
-            </div>
-            
-            <div class="info-panel">
-                <h3>MODE</h3>
-                <div class="value" id="currentMode">BLOCKS</div>
             </div>
             
             <div class="info-panel">
@@ -300,12 +327,6 @@
                 <h3>SCORE</h3>
                 <div class="value" id="currentScore">0</div>
             </div>
-            
-            <div class="info-panel">
-                <h3>HI-SCORE</h3>
-                <div class="value" id="currentHiScore">0</div>
-                <div class="value" id="currentHiScoreName" style="font-size: 12px; color: #ffff00;"></div>
-            </div>
         </div>
 
         <div style="position: relative;">
@@ -318,10 +339,29 @@
             <div id="specialMessage" class="special-message"></div>
         </div>
 
-        <div class="sidebar right-sidebar">
+        <div class="right-sidebar">
             <div class="histogram">
                 <h3>PIECE STATS</h3>
                 <div class="histogram-grid" id="pieceHistogram"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="hiscores-section">
+            <div class="hiscores">
+                <h3>HI-SCORES</h3>
+                <div id="topScores">
+                    <div><strong>Current:</strong> <span id="currentHiScore">0</span> - <span id="currentHiScoreName"></span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-section">
+            <div class="controls">
+                <h3>CONTROLS</h3>
+                <div><strong>W</strong> - Pause | <strong>A/D</strong> - Move | <strong>S</strong> - Fast drop</div>
+                <div><strong>J/K</strong> - Rotate | <strong>R</strong> - Reset | <strong>ESC</strong> - Menu</div>
             </div>
         </div>
     </div>

@@ -501,8 +501,6 @@ class BlocksGame {
     }
     
     updateUI() {
-        const modeNames = ['BABY', 'NORMAL', 'BLOCKS'];
-        document.getElementById('currentMode').textContent = modeNames[this.mode];
         document.getElementById('currentLevel').textContent = this.level;
         document.getElementById('currentLines').textContent = this.lines;
         document.getElementById('currentScore').textContent = this.score;
@@ -604,7 +602,7 @@ class BlocksGame {
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
             if (!this.playing || this.paused) {
-                if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === 'Alt') {
+                if (e.key === 'w' || e.key === 'W') {
                     this.togglePause();
                 }
                 if (e.key === 'r' || e.key === 'R') {
@@ -616,7 +614,6 @@ class BlocksGame {
             const now = Date.now();
             
             switch(e.key) {
-                case 'ArrowLeft':
                 case 'a':
                 case 'A':
                     if (now - this.moveTime > this.moveSpeed) {
@@ -624,7 +621,6 @@ class BlocksGame {
                         this.moveTime = now;
                     }
                     break;
-                case 'ArrowRight':
                 case 'd':
                 case 'D':
                     if (now - this.moveTime > this.moveSpeed) {
@@ -632,27 +628,25 @@ class BlocksGame {
                         this.moveTime = now;
                     }
                     break;
-                case 'ArrowDown':
                 case 's':
                 case 'S':
                     this.dropSpeed = 10; // Fast drop
                     break;
-                case 'ArrowUp':
                 case 'w':
                 case 'W':
                     this.togglePause();
                     break;
-                case 'x':
-                case 'X':
+                case 'j':
+                case 'J':
                     if (now - this.rotateTime > this.rotateSpeed) {
-                        this.rotatePiece(-1);
+                        this.rotatePiece(-1); // Rotate left
                         this.rotateTime = now;
                     }
                     break;
-                case 'c':
-                case 'C':
+                case 'k':
+                case 'K':
                     if (now - this.rotateTime > this.rotateSpeed) {
-                        this.rotatePiece(1);
+                        this.rotatePiece(1); // Rotate right
                         this.rotateTime = now;
                     }
                     break;
@@ -670,7 +664,7 @@ class BlocksGame {
         
         // Handle key release for fast drop
         document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+            if (e.key === 's' || e.key === 'S') {
                 // Reset drop speed when fast drop key is released
                 const baseSpeed = 350 - (25 * this.level);
                 this.dropSpeed = Math.max(baseSpeed, 30);
