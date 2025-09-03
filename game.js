@@ -30,9 +30,18 @@ class BlocksGame {
         this.dropTime = 0;
         this.dropSpeed = 350; // milliseconds
         this.moveTime = 0;
-        this.moveSpeed = 40; // Reduced for faster response
+        this.moveSpeed = 60; // Fast repeat rate
+        this.initialMoveDelay = 100; // Short initial delay before repeat starts
         this.rotateTime = 0;
         this.rotateSpeed = 150;
+        
+        // Movement state tracking
+        this.keysPressed = {
+            left: false,
+            right: false
+        };
+        this.lastMoveDirection = null;
+        this.moveStartTime = 0;
         
         // Piece statistics
         this.pieceStats = {};
@@ -618,15 +627,21 @@ class BlocksGame {
             switch(e.key) {
                 case 'a':
                 case 'A':
-                    if (now - this.moveTime > this.moveSpeed) {
-                        this.movePiece(-1, 0);
+                    if (!this.keysPressed.left) {
+                        this.keysPressed.left = true;
+                        this.movePiece(-1, 0); // Immediate move
+                        this.lastMoveDirection = -1;
+                        this.moveStartTime = now;
                         this.moveTime = now;
                     }
                     break;
                 case 'd':
                 case 'D':
-                    if (now - this.moveTime > this.moveSpeed) {
-                        this.movePiece(1, 0);
+                    if (!this.keysPressed.right) {
+                        this.keysPressed.right = true;
+                        this.movePiece(1, 0); // Immediate move
+                        this.lastMoveDirection = 1;
+                        this.moveStartTime = now;
                         this.moveTime = now;
                     }
                     break;
@@ -671,12 +686,29 @@ class BlocksGame {
             e.preventDefault();
         });
         
-        // Handle key release for fast drop
+        // Handle key release
         document.addEventListener('keyup', (e) => {
-            if (e.key === 's' || e.key === 'S') {
-                // Reset drop speed when fast drop key is released
-                const baseSpeed = 350 - (25 * this.level);
-                this.dropSpeed = Math.max(baseSpeed, 30);
+            switch(e.key) {
+                case 'a':
+                case 'A':
+                    this.keysPressed.left = false;
+                    if (this.lastMoveDirection === -1) {
+                        this.lastMoveDirection = null;
+                    }
+                    break;
+                case 'd':
+                case 'D':
+                    this.keysPressed.right = false;
+                    if (this.lastMoveDirection === 1) {
+                        this.lastMoveDirection = null;
+                    }
+                    break;
+                case 's':
+                case 'S':
+                    // Reset drop speed when fast drop key is released
+                    const baseSpeed = 350 - (25 * this.level);
+                    this.dropSpeed = Math.max(baseSpeed, 30);
+                    break;
             }
         });
         
@@ -715,11 +747,30 @@ class BlocksGame {
                 this.dropTime = 0;
             }
             
+            // Handle continuous movement
+            this.handleContinuousMovement(now);
+            
             this.updateUI();
         }
         
         this.draw();
         requestAnimationFrame(() => this.gameLoop());
+    }
+    
+    handleContinuousMovement(now) {
+        if (this.lastMoveDirection !== null) {
+            const timeSinceStart = now - this.moveStartTime;
+            const timeSinceLastMove = now - this.moveTime;
+            
+            // After initial delay, start repeating moves
+            if (timeSinceStart > this.initialMoveDelay && timeSinceLastMove > this.moveSpeed) {
+                if ((this.lastMoveDirection === -1 && this.keysPressed.left) ||
+                    (this.lastMoveDirection === 1 && this.keysPressed.right)) {
+                    this.movePiece(this.lastMoveDirection, 0);
+                    this.moveTime = now;
+                }
+            }
+        }
     }
 }
 
