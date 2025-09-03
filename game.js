@@ -329,10 +329,12 @@ class BlocksGame {
         if (!this.currentPiece) return;
         
         const rotatedBlocks = this.currentPiece.blocks.map(block => {
-            if (direction === 1) { // Rotate right
+            if (direction === 1) { // Rotate clockwise (90 degrees)
                 return [-block[1], block[0]];
-            } else { // Rotate left
+            } else if (direction === -1) { // Rotate counterclockwise (90 degrees)
                 return [block[1], -block[0]];
+            } else if (direction === 2) { // Rotate 180 degrees
+                return [-block[0], -block[1]];
             }
         });
         
@@ -639,14 +641,21 @@ class BlocksGame {
                 case 'j':
                 case 'J':
                     if (now - this.rotateTime > this.rotateSpeed) {
-                        this.rotatePiece(-1); // Rotate left
+                        this.rotatePiece(-1); // Rotate counterclockwise (CCW)
                         this.rotateTime = now;
                     }
                     break;
                 case 'k':
                 case 'K':
                     if (now - this.rotateTime > this.rotateSpeed) {
-                        this.rotatePiece(1); // Rotate right
+                        this.rotatePiece(2); // Rotate 180 degrees
+                        this.rotateTime = now;
+                    }
+                    break;
+                case 'l':
+                case 'L':
+                    if (now - this.rotateTime > this.rotateSpeed) {
+                        this.rotatePiece(1); // Rotate clockwise (CW)
                         this.rotateTime = now;
                     }
                     break;
