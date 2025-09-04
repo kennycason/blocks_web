@@ -183,21 +183,20 @@ class BlocksGame {
                 { image: 12, blocks: [[-1,0], [0,0], [1,0], [0,-1], [0,1], [2,0]] }, // cross
                 { image: 13, blocks: [[-1,-1], [0,-1], [1,-1], [-1,1], [0,1], [1,1]] }, // layers
                 { image: 14, blocks: [[-1,-1], [-1,0], [0,0], [0,1], [1,-1], [1,0]] }, // Y
-                { image: 15, blocks: [[-1,0], [-1,1], [0,1], [0,1], [1,0], [1,1]] }, // U
-                { image: 16, blocks: [[-2,0], [-1,0], [0,0], [1,0], [2,0], [2,0]] }, // 5 line
+                { image: 15, blocks: [[-1,0], [-1,1], [0,1], [1,0], [1,1]] }, // U
+                { image: 16, blocks: [[-2,0], [-1,0], [0,0], [1,0], [2,0]] }, // 5 line
                 { image: 17, blocks: [[-2,0], [-1,0], [0,0], [1,0], [2,0], [3,0]] }, // 6 line
                 { image: 18, blocks: [[-1,0], [0,0], [1,0], [-1,1], [0,1], [1,1]] }, // 3x2 block
-                { image: 19, blocks: [[-1,0], [0,1], [1,0], [-1,0]] }, // zig-zag
-                { image: 20, blocks: [[-1,0], [0,0], [0,0], [-1,1], [0,1], [1,0]] }, // 2x2 + notch top
-                { image: 21, blocks: [[-1,0], [0,0], [0,0], [-1,1], [0,1], [1,1]] }, // 2x2 + notch bottom
-                { image: 22, blocks: [[0,0], [0,1]] }, // small L
+                { image: 19, blocks: [[-1,0], [0,1], [1,0]] }, // zig-zag
+                { image: 20, blocks: [[-1,0], [0,0], [-1,1], [0,1], [1,0]] }, // 2x2 + notch top
+                { image: 21, blocks: [[-1,0], [0,0], [-1,1], [0,1], [1,1]] }, // 2x2 + notch bottom
+                { image: 22, blocks: [[0,0], [0,1]] }, // 2-line
                 { image: 23, blocks: [[-1,-1], [0,-1], [1,-1], [0,0], [0,1]] }, // big T
                 { image: 24, blocks: [[-1,0], [-1,1], [1,0], [1,1]] }, // short parallel
                 { image: 25, blocks: [[-1,-1], [0,-1], [1,-1], [1,0], [1,1]] }, // big L backwards
                 { image: 26, blocks: [[-2,0], [-1,0], [0,0], [1,0], [2,0], [0,1]] }, // TO
                 { image: 27, blocks: [[-1,0], [0,0], [0,1]] }, // small L
-                { image: 28, blocks: [[-1,0], [0,0], [1,0]] }, // 3x1 line
-                { image: 29, blocks: [[0,0], [0,0], [0,0], [0,0], [0,0], [0,0]] } // crazy (random)
+                { image: 28, blocks: [[-1,0], [0,0], [1,0]] } // 3x1 line
             ]
         };
         
@@ -217,7 +216,7 @@ class BlocksGame {
         switch(this.mode) {
             case 0: maxPieces = 8; break;  // Baby mode
             case 1: maxPieces = 7; break;  // Normal mode
-            case 2: maxPieces = 29; break; // Blocks mode
+            case 2: maxPieces = 28; break; // Blocks mode
         }
         
         const type = Math.floor(Math.random() * maxPieces);
@@ -493,7 +492,7 @@ class BlocksGame {
         switch(this.mode) {
             case 0: maxPieces = 8; break;  // Baby mode
             case 1: maxPieces = 7; break;  // Normal mode  
-            case 2: maxPieces = 29; break; // Blocks mode
+            case 2: maxPieces = 28; break; // Blocks mode
         }
         
         // Create histogram entries for each piece type
@@ -944,11 +943,16 @@ class BlocksGame {
     
     getCurrentHighScores() {
         const key = this.getHighScoreKey();
-        const scores = this.highScores[key] || [
-            { score: 0, lines: 0, name: '', isEmpty: true },
-            { score: 0, lines: 0, name: '', isEmpty: true },
-            { score: 0, lines: 0, name: '', isEmpty: true }
-        ];
+        let scores = this.highScores[key];
+        
+        // Ensure scores is always an array
+        if (!Array.isArray(scores)) {
+            scores = [
+                { score: 0, lines: 0, name: '', isEmpty: true },
+                { score: 0, lines: 0, name: '', isEmpty: true },
+                { score: 0, lines: 0, name: '', isEmpty: true }
+            ];
+        }
         
         // Ensure we always have exactly 3 entries
         while (scores.length < 3) {
@@ -1007,8 +1011,22 @@ class BlocksGame {
         if (isNewHighScore) {
             this.saveHighScores();
             this.updateHighScoresDisplay();
-            this.showSpecialMessage(`NEW HIGH SCORE! #${currentScores.findIndex(hs => 
-                hs.score === this.score && hs.lines === this.lines) + 1}`);
+            
+            // Get fresh scores to find the rank
+            try {
+                const updatedScores = this.getCurrentHighScores();
+                if (Array.isArray(updatedScores)) {
+                    const rank = updatedScores.findIndex(hs => 
+                        hs && hs.score === this.score && hs.lines === this.lines) + 1;
+                    this.showSpecialMessage(`NEW HIGH SCORE! #${rank}`);
+                } else {
+                    console.error('updatedScores is not an array:', updatedScores);
+                    this.showSpecialMessage('NEW HIGH SCORE!');
+                }
+            } catch (error) {
+                console.error('Error processing high score message:', error);
+                this.showSpecialMessage('NEW HIGH SCORE!');
+            }
         }
         
         return isNewHighScore;
