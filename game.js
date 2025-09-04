@@ -1459,36 +1459,37 @@ class BlocksGame {
             console.log('🎮 D-pad RIGHT (button 15) detected');
         }
         
-        // REVERT TO SIMPLE AXIS DETECTION THAT WAS WORKING
-        // When LEFT was working, the mapping was different!
-        if (axes[9] !== undefined && Math.abs(axes[9] - 1.29) > 0.2) {
-            console.log('🎮 D-pad pressed! Axis 9 value:', axes[9]);
-            
-            // LEFT is working - keep this!
+        // IMPROVED AXIS DETECTION FOR DIAGONAL MOVEMENT
+        // Handle horizontal movement (axis 9) - NOTE: axis 9 can only be one value at a time
+        if (axes[9] !== undefined) {
+            // LEFT detection
             if (axes[9] > 0.5 && axes[9] < 1.0) {  // 0.71 value = LEFT (working!)
                 dpadLeft = true;
                 console.log('🎮 LEFT detected! axis 9 =', axes[9]);
             } 
-            // RIGHT is working - keep this!
+            // RIGHT detection
             else if (axes[9] < -0.2 && axes[9] > -0.6) {  // -0.4285714 = RIGHT (working!)
                 dpadRight = true;
                 console.log('🎮 RIGHT detected! axis 9 =', axes[9]);
             }
-            // DOWN detection based on your log: 0.14285719394683838
+            // DOWN detection from axis 9 (when no horizontal movement)
             else if (axes[9] > 0.1 && axes[9] < 0.3) {  // 0.14285719 = DOWN (soft drop like 'S')
                 dpadDown = true;
                 console.log('🎮 DOWN detected! (soft drop like S key) axis 9 =', axes[9]);
             }
-            // Only UP still disabled
-            else {
-                console.log('🎮 Other direction pressed, axis 9 =', axes[9], '(UP disabled for now)');
-            }
         }
         
-        // Vertical movement (axis 10) - handle if it exists
+        // SEPARATE vertical axis (axis 10) for diagonal support
+        // This allows DOWN to work simultaneously with LEFT/RIGHT from axis 9
         if (axes[10] !== undefined) {
-            if (axes[10] > 0.3) dpadDown = true;
-            if (axes[10] < -0.3) dpadUp = true;
+            if (axes[10] > 0.3) {
+                dpadDown = true;
+                console.log('🎮 DOWN detected from axis 10! value =', axes[10]);
+            }
+            if (axes[10] < -0.3) {
+                dpadUp = true;
+                console.log('🎮 UP detected from axis 10! value =', axes[10]);
+            }
         }
         
         // Update last known axes values
@@ -1542,9 +1543,16 @@ class BlocksGame {
             }
         }
         
-        // Pause toggle
+        // Pause toggle (during game)
         if (wasPressed(9)) { // Start button
-            this.togglePause();
+            if (this.gameOver) {
+                // If game is over, start button restarts the game
+                console.log('🎮 Start button pressed - restarting game!');
+                this.newGame();
+            } else {
+                // During game, start button pauses/unpauses
+                this.togglePause();
+            }
         }
         
         // Store current state for next frame
