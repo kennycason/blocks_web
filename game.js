@@ -9,7 +9,7 @@ class BlocksGame {
         this.nextCtx = this.nextCanvas.getContext('2d');
         
         // Game state
-        this.mode = 2; // 0=Baby, 1=Normal, 2=Blocks
+        this.mode = 2; // 0=TRITRIS, 1=TETRIS, 2=HEXTRIS
         this.width = 15;
         this.height = 25;
         this.blockSize = 24;
@@ -144,8 +144,8 @@ class BlocksGame {
     // Piece definitions based on the original PureBasic code
     getPieceDefinition(type, mode) {
         const pieces = {
-            // Baby mode pieces (3 blocks each)
-            baby: [
+            // TRITRIS mode pieces (3 blocks each - triominoes)
+            tritris: [
                 { image: 1, blocks: [[0,0], [0,0], [0,0]] }, // dot
                 { image: 2, blocks: [[0,-1], [0,0], [0,1]] }, // line
                 { image: 3, blocks: [[-1,0], [1,0], [1,0]] }, // spaced
@@ -156,8 +156,8 @@ class BlocksGame {
                 { image: 8, blocks: [[0,0], [0,0], [0,0]] } // random
             ],
             
-            // Normal mode pieces (standard Tetris - 4 blocks each)
-            normal: [
+            // TETRIS mode pieces (standard Tetris - 4 blocks each - tetrominoes)
+            tetris: [
                 { image: 1, blocks: [[0,0], [1,0], [0,1], [1,1]] }, // square
                 { image: 2, blocks: [[-1,1], [-1,0], [0,0], [1,0]] }, // L
                 { image: 3, blocks: [[-1,0], [0,0], [1,0], [1,1]] }, // L-backwards
@@ -167,8 +167,8 @@ class BlocksGame {
                 { image: 7, blocks: [[0,1], [-1,0], [0,0], [1,0]] } // T
             ],
             
-            // Blocks mode pieces (up to 6 blocks each - complex pieces)
-            blocks: [
+            // HEXTRIS mode pieces (up to 6 blocks each - complex pieces/hexominoes)
+            hextris: [
                 { image: 1, blocks: [[0,0], [1,0], [0,1], [1,1]] }, // square
                 { image: 2, blocks: [[-1,1], [-1,0], [0,0], [1,0]] }, // L
                 { image: 3, blocks: [[-1,0], [0,0], [1,0], [1,1]] }, // L-backwards
@@ -200,7 +200,7 @@ class BlocksGame {
             ]
         };
         
-        const modeNames = ['baby', 'normal', 'blocks'];
+        const modeNames = ['tritris', 'tetris', 'hextris'];
         const modeKey = modeNames[mode];
         const pieceArray = pieces[modeKey];
         
@@ -214,9 +214,9 @@ class BlocksGame {
     generateNextPiece() {
         let maxPieces;
         switch(this.mode) {
-            case 0: maxPieces = 8; break;  // Baby mode
-            case 1: maxPieces = 7; break;  // Normal mode
-            case 2: maxPieces = 28; break; // Blocks mode
+            case 0: maxPieces = 8; break;  // TRITRIS mode
+            case 1: maxPieces = 7; break;  // TETRIS mode
+            case 2: maxPieces = 28; break; // HEXTRIS mode
         }
         
         const type = Math.floor(Math.random() * maxPieces);
@@ -490,9 +490,9 @@ class BlocksGame {
         // Get max pieces for current mode
         let maxPieces;
         switch(this.mode) {
-            case 0: maxPieces = 8; break;  // Baby mode
-            case 1: maxPieces = 7; break;  // Normal mode  
-            case 2: maxPieces = 28; break; // Blocks mode
+            case 0: maxPieces = 8; break;  // TRITRIS mode
+            case 1: maxPieces = 7; break;  // TETRIS mode  
+            case 2: maxPieces = 28; break; // HEXTRIS mode
         }
         
         // Create histogram entries for each piece type
@@ -1069,7 +1069,7 @@ window.addEventListener('load', () => {
     window.slidePreset = (preset) => window.game.setSlidePreset(preset);
     window.configSlide = (options) => window.game.configureSlide(options);
     
-    console.log('🎮 Blocks game loaded!');
+    console.log('🎮 HEXTRIS game loaded!');
     console.log('💡 Try these in console:');
     console.log('   slidePreset("minimal")    - Basic sliding');
     console.log('   slidePreset("standard")   - Default sliding (current)');
