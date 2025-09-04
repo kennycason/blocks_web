@@ -57,20 +57,15 @@
         }
         
         /* Hide all abstract elements by default */
-        .geometric-patterns,
-        .spiral-1, .spiral-2, .spiral-3,
-        .chaos-particles,
-        .crystal-formations,
-        .energy-waves,
-        .portal-rings,
-        .lightning-storm,
-        .aurora-borealis,
-        .meteor-shower,
-        .dimensional-rifts,
-        .plasma-field,
-        .void-tentacles,
-        .fractal-trees,
-        .time-distortion {
+        .geometric-patterns, .spiral-1, .spiral-2, .spiral-3, .chaos-particles,
+        .crystal-formations, .energy-waves, .portal-rings, .lightning-storm,
+        .aurora-borealis, .meteor-shower, .dimensional-rifts, .plasma-field,
+        .void-tentacles, .fractal-trees, .time-distortion, .volcanic-eruption,
+        .ice-crystals, .underwater-bubbles, .alien-spores, .digital-rain,
+        .circuit-patterns, .holographic-grid, .dna-helixes, .cell-division,
+        .atomic-particles, .black-hole-accretion, .galactic-spirals, .quasar-jets,
+        .dream-clouds, .floating-eyes, .melting-reality, .impossible-geometry,
+        .time-echoes, .void-whispers {
             display: none !important;
         }
         
@@ -528,6 +523,263 @@
                 radial-gradient(circle at 50% 50%, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
             background-size: 200px 200px, 300px 300px;
             animation: timeWarp 12s linear infinite;
+        }
+        
+        /* Natural World Effects */
+        .volcanic-eruption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: 
+                radial-gradient(ellipse 100px 300px at 20% 100%, rgba(255, 69, 0, 0.8), transparent),
+                radial-gradient(ellipse 80px 250px at 70% 100%, rgba(255, 140, 0, 0.6), transparent),
+                radial-gradient(ellipse 120px 200px at 50% 100%, rgba(255, 0, 0, 0.7), transparent);
+            animation: volcanicErupt 6s ease-in-out infinite;
+        }
+        
+        .ice-crystals {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                conic-gradient(from 0deg at 20% 30%, transparent 50deg, rgba(173, 216, 230, 0.6) 60deg, transparent 70deg),
+                conic-gradient(from 60deg at 80% 20%, transparent 40deg, rgba(135, 206, 250, 0.5) 50deg, transparent 60deg),
+                conic-gradient(from 120deg at 60% 70%, transparent 30deg, rgba(176, 224, 230, 0.7) 40deg, transparent 50deg);
+            animation: crystalFreeze 8s ease-in-out infinite;
+        }
+        
+        .underwater-bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle 15px at 100px 200px, rgba(64, 224, 208, 0.6), transparent),
+                radial-gradient(circle 20px at 300px 400px, rgba(0, 206, 209, 0.5), transparent),
+                radial-gradient(circle 10px at 500px 100px, rgba(72, 209, 204, 0.7), transparent),
+                radial-gradient(circle 25px at 200px 500px, rgba(95, 158, 160, 0.4), transparent);
+            animation: bubbleFloat 5s ease-in-out infinite;
+        }
+        
+        .alien-spores {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle 8px at 150px 150px, rgba(124, 252, 0, 0.8), transparent),
+                radial-gradient(circle 12px at 350px 250px, rgba(50, 205, 50, 0.6), transparent),
+                radial-gradient(circle 6px at 550px 350px, rgba(0, 255, 127, 0.9), transparent),
+                radial-gradient(circle 10px at 250px 450px, rgba(127, 255, 0, 0.7), transparent);
+            animation: sporesDrift 7s ease-in-out infinite;
+        }
+        
+        /* Digital & Matrix Effects */
+        .digital-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, transparent 90%, rgba(0, 255, 0, 0.3) 91%, transparent 92%),
+                linear-gradient(180deg, transparent 85%, rgba(0, 255, 0, 0.2) 86%, transparent 88%),
+                linear-gradient(180deg, transparent 80%, rgba(0, 255, 0, 0.4) 81%, transparent 83%);
+            background-size: 20px 200px, 15px 180px, 25px 220px;
+            animation: matrixRain 3s linear infinite;
+        }
+        
+        .circuit-patterns {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(0deg, transparent 48%, rgba(0, 255, 255, 0.3) 49%, rgba(0, 255, 255, 0.3) 51%, transparent 52%),
+                linear-gradient(90deg, transparent 48%, rgba(0, 255, 255, 0.2) 49%, rgba(0, 255, 255, 0.2) 51%, transparent 52%),
+                conic-gradient(from 0deg at 25% 25%, transparent, rgba(0, 255, 255, 0.4), transparent);
+            background-size: 100px 100px, 100px 100px, 200px 200px;
+            animation: circuitPulse 4s ease-in-out infinite;
+        }
+        
+        .holographic-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 98%, rgba(0, 255, 255, 0.3) 99%, transparent 100%),
+                linear-gradient(-45deg, transparent 98%, rgba(255, 0, 255, 0.2) 99%, transparent 100%);
+            background-size: 50px 50px, 50px 50px;
+            animation: holoShift 6s ease-in-out infinite;
+        }
+        
+        /* Microscopic & Cosmic Effects */
+        .dna-helixes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 48%, rgba(255, 20, 147, 0.4) 49%, rgba(0, 191, 255, 0.4) 50%, rgba(255, 20, 147, 0.4) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(0, 191, 255, 0.3) 49%, rgba(255, 20, 147, 0.3) 50%, rgba(0, 191, 255, 0.3) 51%, transparent 52%);
+            background-size: 30px 200px, 30px 200px;
+            animation: dnaSpiral 8s linear infinite;
+        }
+        
+        .cell-division {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle 40px at 200px 200px, rgba(50, 205, 50, 0.3), transparent),
+                radial-gradient(circle 35px at 400px 300px, rgba(34, 139, 34, 0.4), transparent),
+                radial-gradient(circle 45px at 100px 400px, rgba(0, 255, 0, 0.2), transparent);
+            animation: cellSplit 10s ease-in-out infinite;
+        }
+        
+        .atomic-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle 3px at 150px 150px, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(circle 2px at 300px 250px, rgba(255, 215, 0, 0.8), transparent),
+                radial-gradient(circle 4px at 450px 350px, rgba(0, 191, 255, 0.7), transparent),
+                radial-gradient(circle 1px at 250px 400px, rgba(255, 69, 0, 0.9), transparent);
+            animation: particleOrbit 6s linear infinite;
+        }
+        
+        .black-hole-accretion {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: 
+                radial-gradient(circle, rgba(0, 0, 0, 0.9) 20%, rgba(255, 69, 0, 0.6) 40%, rgba(255, 215, 0, 0.3) 60%, transparent 80%);
+            border-radius: 50%;
+            animation: accretionDisk 5s linear infinite;
+        }
+        
+        .galactic-spirals {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.2), transparent, rgba(138, 43, 226, 0.3), transparent),
+                conic-gradient(from 90deg, transparent, rgba(75, 0, 130, 0.2), transparent, rgba(255, 255, 255, 0.1), transparent);
+            background-size: 400px 400px, 350px 350px;
+            animation: galaxySpiral 20s linear infinite;
+        }
+        
+        .quasar-jets {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 48%, rgba(255, 255, 255, 0.8) 49%, rgba(0, 191, 255, 0.6) 50%, rgba(255, 255, 255, 0.8) 51%, transparent 52%),
+                linear-gradient(0deg, transparent 48%, rgba(255, 215, 0, 0.7) 49%, rgba(255, 69, 0, 0.5) 50%, rgba(255, 215, 0, 0.7) 51%, transparent 52%);
+            background-size: 500px 50px, 50px 500px;
+            animation: quasarBeam 4s ease-in-out infinite;
+        }
+        
+        /* Surreal & Dreamlike Effects */
+        .dream-clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 200px 100px at 20% 30%, rgba(255, 182, 193, 0.3), transparent),
+                radial-gradient(ellipse 150px 80px at 70% 60%, rgba(221, 160, 221, 0.4), transparent),
+                radial-gradient(ellipse 180px 90px at 50% 80%, rgba(255, 240, 245, 0.2), transparent);
+            animation: dreamFloat 12s ease-in-out infinite;
+        }
+        
+        .floating-eyes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 15px 20px at 200px 200px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.9) 40%, transparent 60%),
+                radial-gradient(ellipse 12px 18px at 400px 350px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0.8) 35%, transparent 55%),
+                radial-gradient(ellipse 18px 22px at 100px 450px, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.9) 45%, transparent 65%);
+            animation: eyesWatch 8s ease-in-out infinite;
+        }
+        
+        .melting-reality {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, transparent 30%, rgba(255, 0, 255, 0.3) 40%, rgba(0, 255, 255, 0.3) 60%, transparent 70%),
+                linear-gradient(-45deg, transparent 20%, rgba(255, 255, 0, 0.2) 30%, rgba(255, 0, 0, 0.2) 50%, transparent 60%);
+            background-size: 300px 200px, 250px 180px;
+            animation: realityMelt 9s ease-in-out infinite;
+        }
+        
+        .impossible-geometry {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                conic-gradient(from 0deg at 30% 30%, transparent 60deg, rgba(255, 255, 255, 0.3) 120deg, transparent 180deg, rgba(255, 255, 255, 0.2) 240deg, transparent 300deg),
+                conic-gradient(from 45deg at 70% 70%, transparent 90deg, rgba(0, 0, 0, 0.4) 180deg, transparent 270deg);
+            background-size: 150px 150px, 200px 200px;
+            animation: impossibleRotate 15s linear infinite;
+        }
+        
+        .time-echoes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 20%, transparent 40%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.15) 15%, transparent 35%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 30%, transparent 50%);
+            animation: echoRipple 7s ease-in-out infinite;
+        }
+        
+        .void-whispers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 99%, rgba(72, 61, 139, 0.6) 99.5%, transparent 100%),
+                linear-gradient(-45deg, transparent 99%, rgba(75, 0, 130, 0.4) 99.5%, transparent 100%),
+                radial-gradient(circle at random, rgba(25, 25, 112, 0.2), transparent 30%);
+            background-size: 200px 200px, 180px 180px, 100px 100px;
+            animation: voidWhisper 11s ease-in-out infinite;
         }
         
         /* Keyframe animations */
@@ -1301,15 +1553,40 @@
         <div class="energy-waves"></div>
         <div class="portal-rings"></div>
         
-        <!-- New Effects -->
+        <!-- Weather & Natural Effects -->
         <div class="lightning-storm"></div>
         <div class="aurora-borealis"></div>
         <div class="meteor-shower"></div>
+        <div class="volcanic-eruption"></div>
+        <div class="ice-crystals"></div>
+        <div class="underwater-bubbles"></div>
+        <div class="alien-spores"></div>
+        
+        <!-- Abstract & Digital Effects -->
         <div class="dimensional-rifts"></div>
         <div class="plasma-field"></div>
         <div class="void-tentacles"></div>
         <div class="fractal-trees"></div>
         <div class="time-distortion"></div>
+        <div class="digital-rain"></div>
+        <div class="circuit-patterns"></div>
+        <div class="holographic-grid"></div>
+        
+        <!-- Microscopic & Cosmic Effects -->
+        <div class="dna-helixes"></div>
+        <div class="cell-division"></div>
+        <div class="atomic-particles"></div>
+        <div class="black-hole-accretion"></div>
+        <div class="galactic-spirals"></div>
+        <div class="quasar-jets"></div>
+        
+        <!-- Surreal & Dreamlike Effects -->
+        <div class="dream-clouds"></div>
+        <div class="floating-eyes"></div>
+        <div class="melting-reality"></div>
+        <div class="impossible-geometry"></div>
+        <div class="time-echoes"></div>
+        <div class="void-whispers"></div>
     </div>
 
     <div class="menu-bar">

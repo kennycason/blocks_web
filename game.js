@@ -79,18 +79,28 @@ class BlocksGame {
         
         // Environment evolution system
         this.evolutionProgress = 0; // 0-100% through complete evolution cycle
-        this.maxEvolutionSteps = 100; // Total pieces needed for full cycle (longer journey!)
+        this.maxEvolutionSteps = 1000; // 0.1% per piece, 1% per line (EPIC journey!)
         this.evolutionPhases = [
-            { name: 'sunny-day', start: 0, end: 12 },
-            { name: 'sunset', start: 10, end: 22 },
-            { name: 'night', start: 20, end: 32 },
-            { name: 'space', start: 30, end: 42 },
-            { name: 'nebula-storm', start: 40, end: 52 },
-            { name: 'geometric-void', start: 50, end: 62 },
-            { name: 'spiral-dimension', start: 60, end: 72 },
-            { name: 'abstract-chaos', start: 70, end: 82 },
-            { name: 'crystal-realm', start: 80, end: 92 },
-            { name: 'returning-dawn', start: 90, end: 100 }
+            { name: 'sunny-day', start: 0, end: 6 },
+            { name: 'sunset', start: 5, end: 11 },
+            { name: 'night', start: 10, end: 16 },
+            { name: 'space', start: 15, end: 21 },
+            { name: 'nebula-storm', start: 20, end: 26 },
+            { name: 'alien-world', start: 25, end: 31 },
+            { name: 'underwater-realm', start: 30, end: 36 },
+            { name: 'volcanic-dimension', start: 35, end: 41 },
+            { name: 'ice-age', start: 40, end: 46 },
+            { name: 'geometric-void', start: 45, end: 51 },
+            { name: 'spiral-dimension', start: 50, end: 56 },
+            { name: 'digital-matrix', start: 55, end: 61 },
+            { name: 'abstract-chaos', start: 60, end: 66 },
+            { name: 'microscopic-world', start: 65, end: 71 },
+            { name: 'galactic-core', start: 70, end: 76 },
+            { name: 'dreamscape', start: 75, end: 81 },
+            { name: 'crystal-realm', start: 80, end: 86 },
+            { name: 'time-fracture', start: 85, end: 91 },
+            { name: 'void-between-worlds', start: 90, end: 96 },
+            { name: 'returning-dawn', start: 95, end: 100 }
         ];
         
         // Sprite sheet for piece textures
@@ -340,6 +350,7 @@ class BlocksGame {
             this.lines += linesCleared;
             this.updateScore(linesCleared);
             this.updateLevel();
+            this.evolveEnvironmentByLines(linesCleared);
         }
     }
     
@@ -779,8 +790,20 @@ class BlocksGame {
     }
     
     evolveEnvironment() {
-        // Advance evolution by 1% each piece (100 pieces = full cycle)
-        this.evolutionProgress += 1;
+        // Advance evolution by 0.1% each piece (slow, steady progress)
+        this.evolutionProgress += 0.2;
+        
+        // Cycle back to beginning after 100%
+        if (this.evolutionProgress >= 100) {
+            this.evolutionProgress = 0;
+        }
+        
+        this.updateEnvironmentMorphing();
+    }
+    
+    evolveEnvironmentByLines(linesCleared) {
+        // Advance evolution by 1% per line cleared (major progress!)
+        this.evolutionProgress += linesCleared * 1.0;
         
         // Cycle back to beginning after 100%
         if (this.evolutionProgress >= 100) {
