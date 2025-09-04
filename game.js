@@ -70,7 +70,7 @@ class BlocksGame {
         this.pieceStats = {};
         this.totalPieces = 0;
         
-        // High scores system
+        // High scores system (keyed by mode+size)
         this.highScores = this.loadHighScores();
         
         // Special message display
@@ -311,30 +311,40 @@ class BlocksGame {
         let bonus = 0;
         let message = '';
         
+        // Message arrays for each line clear count
+        const messageArrays = {
+            1: ['NICE!', 'GOOD!', 'WOAH!', 'SINGLE!', 'ONE!'],
+            2: ['DOUBLE!', 'X2!!', 'TWICE!', 'PAIR!', 'SWEET!'],
+            3: ['TRIPLE!', 'WHAMMO!', 'GREAT!', 'THREE!', 'AMAZING!'],
+            4: ['TETRIS!', 'AWESOME!', 'QUAD!', 'FOUR!', 'FANTASTIC!'],
+            5: ['PENTA!', 'ALMOST!', 'FIVE!', 'INCREDIBLE!', 'SUPER!'],
+            6: ['HEXA!', 'BLOCK!', 'SIX!', 'ULTIMATE!', 'LEGENDARY!', 'EPIC!']
+        };
+        
         if (linesCleared === 1) {
             bonus = 150;
-            message = 'WOAH!'
         } else if (linesCleared === 2) {
             bonus = 350;
-             message = 'X2!!'
         } else if (linesCleared === 3) {
             bonus = 2500;
-            message = this.mode === 0 ? 'WHAMMO!' : 'GREAT!';
         } else if (linesCleared === 4) {
             bonus = 5000;
-            message = this.mode === 0 ? 'GOOD!' : 'AWESOME!';
         } else if (linesCleared === 5) {
             bonus = 10000;
-            message = 'ALMOST!';
         } else if (linesCleared >= 6) {
             bonus = 15000;
-            message = 'BLOCK!!';
+        }
+        
+        // Pick random message from appropriate array
+        if (linesCleared >= 1) {
+            const messages = messageArrays[Math.min(linesCleared, 6)];
+            message = messages[Math.floor(Math.random() * messages.length)];
         }
         
         this.score += bonus;
         
         if (message) {
-            this.showSpecialMessage(message);
+            this.showSpecialMessage(message, linesCleared);
         }
     }
     
@@ -353,11 +363,41 @@ class BlocksGame {
         }
     }
     
-    showSpecialMessage(message) {
+    showSpecialMessage(message, linesCleared = 0) {
         this.specialMessage = message;
-        this.specialMessageTime = 1000; // Show for 1 second
-        document.getElementById('specialMessage').textContent = message;
-        document.getElementById('specialMessage').style.display = 'block';
+        this.specialMessageTime = 1200; // Show for 1.2 seconds (200ms longer)
+        
+        const messageEl = document.getElementById('specialMessage');
+        messageEl.textContent = message;
+        messageEl.style.display = 'block';
+        
+        // Apply visual effects based on lines cleared
+        this.applyMessageEffects(messageEl, linesCleared);
+    }
+    
+    applyMessageEffects(element, linesCleared) {
+        // Reset all effects first
+        element.className = 'special-message';
+        
+        if (linesCleared === 1) {
+            // Basic glow
+            element.classList.add('effect-glow-basic');
+        } else if (linesCleared === 2) {
+            // Stronger glow with pulse
+            element.classList.add('effect-glow-pulse');
+        } else if (linesCleared === 3) {
+            // Color changing glow
+            element.classList.add('effect-glow-color');
+        } else if (linesCleared === 4) {
+            // Fireworks effect
+            element.classList.add('effect-fireworks');
+        } else if (linesCleared === 5) {
+            // Intense fireworks with shake
+            element.classList.add('effect-fireworks-intense');
+        } else if (linesCleared >= 6) {
+            // Rainbow ultimate effect
+            element.classList.add('effect-rainbow-ultimate');
+        }
     }
     
     rotatePiece(direction) {
@@ -594,11 +634,7 @@ class BlocksGame {
     
     resetHighScores() {
         if (confirm('Are you sure you want to reset all high scores?')) {
-            this.highScores = [
-                { score: 0, lines: 0, name: '', isEmpty: true },
-                { score: 0, lines: 0, name: '', isEmpty: true },
-                { score: 0, lines: 0, name: '', isEmpty: true }
-            ];
+            this.highScores = {}; // Reset to empty object for keyed system
             localStorage.removeItem('blocksHighScores');
             this.updateHighScoresDisplay();
         }
@@ -632,6 +668,7 @@ class BlocksGame {
     
     changeMode(newMode) {
         this.mode = parseInt(newMode);
+        this.updateHighScoresDisplay(); // Update display for new mode+size combination
         this.newGame();
     }
     
@@ -651,6 +688,7 @@ class BlocksGame {
                 break;
         }
         this.resizeCanvas();
+        this.updateHighScoresDisplay(); // Update display for new mode+size combination
         this.newGame();
     }
     
@@ -692,7 +730,7 @@ class BlocksGame {
                     break;
                 case 's':
                 case 'S':
-                    this.dropSpeed = 10; // Fast drop
+                    this.dropSpeed = 35; // Fast drop (10x faster than normal ~350ms, much safer than old 10ms)
                     break;
                 case 'w':
                 case 'W':
@@ -885,7 +923,7 @@ class BlocksGame {
         }
     }
     
-    // High Scores Management
+    // High Scores Management (keyed by mode+size)
     loadHighScores() {
         try {
             const saved = localStorage.getItem('blocksHighScores');
@@ -896,12 +934,28 @@ class BlocksGame {
             console.warn('Failed to load high scores:', error);
         }
         
-        // Return default empty high scores
-        return [
+        // Return default empty high scores object
+        return {};
+    }
+    
+    getHighScoreKey() {
+        return `${this.mode}_${this.getSizeKey()}`;
+    }
+    
+    getCurrentHighScores() {
+        const key = this.getHighScoreKey();
+        const scores = this.highScores[key] || [
             { score: 0, lines: 0, name: '', isEmpty: true },
             { score: 0, lines: 0, name: '', isEmpty: true },
             { score: 0, lines: 0, name: '', isEmpty: true }
         ];
+        
+        // Ensure we always have exactly 3 entries
+        while (scores.length < 3) {
+            scores.push({ score: 0, lines: 0, name: '', isEmpty: true });
+        }
+        
+        return scores;
     }
     
     saveHighScores() {
@@ -914,13 +968,15 @@ class BlocksGame {
     
     checkAndUpdateHighScore() {
         let isNewHighScore = false;
+        const key = this.getHighScoreKey();
+        const currentScores = this.getCurrentHighScores();
         
         // Check if current score qualifies for top 3
         for (let i = 0; i < 3; i++) {
-            const existing = this.highScores[i];
+            const existing = currentScores[i];
             
             // If this slot is empty or current score is higher
-            if (existing.isEmpty || this.score > existing.score || 
+            if (!existing || existing.isEmpty || this.score > existing.score || 
                 (this.score === existing.score && this.lines > existing.lines)) {
                 
                 // Get player name
@@ -934,11 +990,15 @@ class BlocksGame {
                 
                 // Shift existing scores down
                 for (let j = 2; j > i; j--) {
-                    this.highScores[j] = { ...this.highScores[j-1] };
+                    currentScores[j] = { ...currentScores[j-1] };
                 }
                 
                 // Insert new high score
-                this.highScores[i] = currentScore;
+                currentScores[i] = currentScore;
+                
+                // Save back to main scores object
+                this.highScores[key] = currentScores;
+                
                 isNewHighScore = true;
                 break;
             }
@@ -947,7 +1007,7 @@ class BlocksGame {
         if (isNewHighScore) {
             this.saveHighScores();
             this.updateHighScoresDisplay();
-            this.showSpecialMessage(`NEW HIGH SCORE! #${this.highScores.findIndex(hs => 
+            this.showSpecialMessage(`NEW HIGH SCORE! #${currentScores.findIndex(hs => 
                 hs.score === this.score && hs.lines === this.lines) + 1}`);
         }
         
@@ -958,10 +1018,12 @@ class BlocksGame {
         const hiscoresContainer = document.querySelector('.hiscores-list');
         if (!hiscoresContainer) return;
         
+        const currentScores = this.getCurrentHighScores();
+        
         let html = '';
         for (let i = 0; i < 3; i++) {
-            const hs = this.highScores[i];
-            if (hs.isEmpty) {
+            const hs = currentScores[i];
+            if (!hs || hs.isEmpty) {
                 html += `<div class="hiscore-entry">
                     <span class="rank">${i + 1}.</span>
                     <span class="score">-----</span>
@@ -971,9 +1033,9 @@ class BlocksGame {
             } else {
                 html += `<div class="hiscore-entry">
                     <span class="rank">${i + 1}.</span>
-                    <span class="score">${hs.score.toLocaleString()}</span>
-                    <span class="lines">${hs.lines}</span>
-                    <span class="name">${hs.name}</span>
+                    <span class="score">${(hs.score || 0).toLocaleString()}</span>
+                    <span class="lines">${hs.lines || 0}</span>
+                    <span class="name">${hs.name || 'NO NAME'}</span>
                 </div>`;
             }
         }
