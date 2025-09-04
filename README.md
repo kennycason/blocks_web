@@ -16,18 +16,18 @@ Compiled with PureBasic 3.94
 <table>
 <tr>
     <td>
-        <img src="/screenshots/screenshot_new.png" width="45%"/>
+        <img src="/screenshots/screenshot_new.png"/>
     </td>
     <td>
-        <img src="/screenshots/screenshot_new2.png" width="45%"/>
+        <img src="/screenshots/screenshot_new2.png"/>
     </td>
 </tr>
 <tr>
     <td>
-        <img src="/screenshots/screenshot.JPG" width="45%"/>
+        <img src="/screenshots/screenshot.JPG"/>
     </td>
     <td>
-        <img src="/screenshots/screenshot4.JPG" width="45%"/>
+        <img src="/screenshots/screenshot4.JPG"/>
     </td>
 </tr>
 </table>
