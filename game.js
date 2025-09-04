@@ -77,6 +77,18 @@ class BlocksGame {
         this.specialMessage = '';
         this.specialMessageTime = 0;
         
+        // Gamepad support
+        this.gamepadIndex = null;
+        this.gamepadButtons = {};
+        this.gamepadAxes = {};
+        this.lastGamepadState = {};
+        this.lastGamepadAxes = {};
+        this.gamepadDeadzone = 0.5;
+        this.gamepadMoveDelay = 50; // 50ms delay for left/right to prevent double-moves
+        this.lastGamepadMoveTime = 0;
+        this.gamepadDownPressed = false; // Track if down is currently pressed
+        this.originalDropSpeed = this.dropSpeed; // Store original drop speed
+        
         // Environment evolution system
         this.evolutionProgress = 0; // 0-100% through complete evolution cycle
         this.maxEvolutionSteps = 1000; // 0.1% per piece, 1% per line (EPIC journey!)
@@ -147,6 +159,7 @@ class BlocksGame {
         this.initGame();
         this.updateHighScoresDisplay();
         this.setupEventListeners();
+        this.setupGamepadSupport();
         this.gameLoop();
     }
     
@@ -540,6 +553,24 @@ class BlocksGame {
         }
     }
     
+    softDrop() {
+        // Same as normal drop, just moves piece down one row
+        this.dropPiece();
+    }
+    
+    hardDrop() {
+        // Drop piece as far down as possible instantly
+        if (!this.currentPiece) return;
+        
+        let dropDistance = 0;
+        while (this.movePiece(0, 1)) {
+            dropDistance++;
+        }
+        
+        // Place the piece immediately
+        this.placePiece();
+    }
+    
     updateHistogram() {
         const histogramDiv = document.getElementById('pieceHistogram');
         if (!histogramDiv) return;
@@ -741,6 +772,10 @@ class BlocksGame {
         this.dropSpeed = 800;
         this.pieceStats = {};
         this.totalPieces = 0;
+        
+        // Reset gamepad state
+        this.gamepadDownPressed = false;
+        this.originalDropSpeed = this.dropSpeed;
         
         // Reset environment evolution
         this.evolutionProgress = 0;
@@ -1302,10 +1337,227 @@ class BlocksGame {
         });
     }
     
+    setupGamepadSupport() {
+        // Gamepad connection events
+        window.addEventListener('gamepadconnected', (e) => {
+            console.log('🎮 Gamepad connected:', e.gamepad.id);
+            this.gamepadIndex = e.gamepad.index;
+            this.updateGamepadStatus(e.gamepad.id, true);
+        });
+        
+        window.addEventListener('gamepaddisconnected', (e) => {
+            console.log('🎮 Gamepad disconnected');
+            if (e.gamepad.index === this.gamepadIndex) {
+                this.gamepadIndex = null;
+                this.updateGamepadStatus('', false);
+            }
+        });
+        
+        // Check for existing gamepads
+        const gamepads = navigator.getGamepads();
+        for (let i = 0; i < gamepads.length; i++) {
+            if (gamepads[i]) {
+                console.log('🎮 Found existing gamepad:', gamepads[i].id);
+                this.gamepadIndex = i;
+                this.updateGamepadStatus(gamepads[i].id, true);
+                break;
+            }
+        }
+    }
+    
+    updateGamepadStatus(gamepadName, isConnected) {
+        const statusElement = document.getElementById('gamepad-status');
+        const nameElement = document.getElementById('gamepad-name');
+        
+        if (isConnected) {
+            // Extract just the controller name, remove vendor/product info
+            const cleanName = gamepadName.split('(')[0].trim();
+            nameElement.textContent = cleanName;
+            statusElement.style.display = 'block';
+        } else {
+            statusElement.style.display = 'none';
+        }
+    }
+    
+    updateGamepad() {
+        if (this.gamepadIndex === null) return;
+        
+        const gamepad = navigator.getGamepads()[this.gamepadIndex];
+        if (!gamepad) return;
+        
+        // SNES/Switch Controller Button Mapping:
+        // 0 = B (CCW rotation)
+        // 1 = A (CW rotation) 
+        // 2 = Y (180° rotation)
+        // 3 = X (180° rotation)
+        // 4 = L shoulder (CCW rotation)
+        // 5 = R shoulder (CW rotation)
+        // 8 = Select
+        // 9 = Start (pause)
+        // 12 = D-pad Up (traditional) or Axes[7] < -0.5
+        // 13 = D-pad Down (traditional) or Axes[7] > 0.5  
+        // 14 = D-pad Left (traditional) or Axes[6] < -0.5
+        // 15 = D-pad Right (traditional) or Axes[6] > 0.5
+        
+        const buttons = gamepad.buttons;
+        const axes = gamepad.axes;
+        
+        // Debug logging for gamepad inputs
+        if (Math.random() < 0.02) { // Log occasionally to avoid spam
+            console.log('🎮 Gamepad Debug:');
+            console.log('Buttons:', gamepad.buttons.map((btn, i) => btn.pressed ? `${i}:pressed` : null).filter(x => x));
+            console.log('Axes:', gamepad.axes.map((axis, i) => Math.abs(axis) > 0.05 ? `${i}:${axis.toFixed(2)}` : null).filter(x => x));
+        }
+        const currentState = {};
+        
+        // Track button states
+        for (let i = 0; i < buttons.length; i++) {
+            currentState[i] = buttons[i].pressed;
+        }
+        
+        // Switch controller D-pad detection using change-based logic
+        // Your controller: axis 9 = horizontal (rests at ~1.29), axis 10 = vertical
+        
+        // Store previous axis values for change detection
+        if (!this.lastGamepadAxes[9]) this.lastGamepadAxes[9] = axes[9] || 0;
+        if (!this.lastGamepadAxes[10]) this.lastGamepadAxes[10] = axes[10] || 0;
+        
+        // Detect significant changes from resting position
+        const axis9Change = Math.abs((axes[9] || 0) - this.lastGamepadAxes[9]);
+        const axis10Change = Math.abs((axes[10] || 0) - this.lastGamepadAxes[10]);
+        
+        // Detailed axis logging
+        if (Math.random() < 0.02) {
+            console.log('Axis 9 (horizontal):', axes[9]?.toFixed(2), 'Last:', this.lastGamepadAxes[9]?.toFixed(2), 'Change:', axis9Change?.toFixed(2));
+            console.log('Axis 10 (vertical):', axes[10]?.toFixed(2), 'Last:', this.lastGamepadAxes[10]?.toFixed(2), 'Change:', axis10Change?.toFixed(2));
+        }
+        
+        // D-pad detection with debug logging
+        let dpadLeft = false, dpadRight = false, dpadUp = false, dpadDown = false;
+        
+        // Log gamepad mapping info for debugging
+        if (Math.random() < 0.01) {
+            console.log('🎮 Controller mapping:', gamepad.mapping, 'Buttons length:', buttons.length);
+            console.log('🎮 All axes values:', axes.map((axis, i) => `${i}:${axis?.toFixed(2)}`).filter(x => x && !x.includes('0.00')));
+        }
+        
+        // Standard D-pad button detection (buttons 12-15) - try first
+        if (buttons[12] && buttons[12].pressed) {
+            dpadUp = true;
+            console.log('🎮 D-pad UP (button 12) detected');
+        }
+        if (buttons[13] && buttons[13].pressed) {
+            dpadDown = true;
+            console.log('🎮 D-pad DOWN (button 13) detected');
+        }
+        if (buttons[14] && buttons[14].pressed) {
+            dpadLeft = true;
+            console.log('🎮 D-pad LEFT (button 14) detected');
+        }
+        if (buttons[15] && buttons[15].pressed) {
+            dpadRight = true;
+            console.log('🎮 D-pad RIGHT (button 15) detected');
+        }
+        
+        // REVERT TO SIMPLE AXIS DETECTION THAT WAS WORKING
+        // When LEFT was working, the mapping was different!
+        if (axes[9] !== undefined && Math.abs(axes[9] - 1.29) > 0.2) {
+            console.log('🎮 D-pad pressed! Axis 9 value:', axes[9]);
+            
+            // LEFT is working - keep this!
+            if (axes[9] > 0.5 && axes[9] < 1.0) {  // 0.71 value = LEFT (working!)
+                dpadLeft = true;
+                console.log('🎮 LEFT detected! axis 9 =', axes[9]);
+            } 
+            // RIGHT is working - keep this!
+            else if (axes[9] < -0.2 && axes[9] > -0.6) {  // -0.4285714 = RIGHT (working!)
+                dpadRight = true;
+                console.log('🎮 RIGHT detected! axis 9 =', axes[9]);
+            }
+            // DOWN detection based on your log: 0.14285719394683838
+            else if (axes[9] > 0.1 && axes[9] < 0.3) {  // 0.14285719 = DOWN (soft drop like 'S')
+                dpadDown = true;
+                console.log('🎮 DOWN detected! (soft drop like S key) axis 9 =', axes[9]);
+            }
+            // Only UP still disabled
+            else {
+                console.log('🎮 Other direction pressed, axis 9 =', axes[9], '(UP disabled for now)');
+            }
+        }
+        
+        // Vertical movement (axis 10) - handle if it exists
+        if (axes[10] !== undefined) {
+            if (axes[10] > 0.3) dpadDown = true;
+            if (axes[10] < -0.3) dpadUp = true;
+        }
+        
+        // Update last known axes values
+        this.lastGamepadAxes[9] = axes[9] || 0;
+        this.lastGamepadAxes[10] = axes[10] || 0;
+        
+        // Only trigger on button press (not hold)
+        const wasPressed = (buttonIndex) => {
+            return currentState[buttonIndex] && !this.lastGamepadState[buttonIndex];
+        };
+        
+        if (!this.gameOver && !this.paused) {
+            // Rotation controls
+            if (wasPressed(1) || wasPressed(5)) { // A or R shoulder = CW
+                this.rotatePiece(1);
+            }
+            if (wasPressed(0) || wasPressed(4)) { // B or L shoulder = CCW  
+                this.rotatePiece(-1);
+            }
+            if (wasPressed(2) || wasPressed(3)) { // Y or X = 180°
+                this.rotatePiece(2);
+            }
+            
+            // Movement controls with throttling to prevent double-moves
+            const now = Date.now();
+            if (dpadLeft && (now - this.lastGamepadMoveTime > this.gamepadMoveDelay)) {
+                console.log('🎮 D-pad Left detected!');
+                this.movePiece(-1, 0);
+                this.lastGamepadMoveTime = now;
+            }
+            if (dpadRight && (now - this.lastGamepadMoveTime > this.gamepadMoveDelay)) {
+                console.log('🎮 D-pad Right detected!');
+                this.movePiece(1, 0);
+                this.lastGamepadMoveTime = now;
+            }
+            // Handle down button like keyboard 'S' key - change drop speed
+            if (dpadDown && !this.gamepadDownPressed) {
+                console.log('🎮 D-pad Down pressed - speeding up drop!');
+                this.gamepadDownPressed = true;
+                this.originalDropSpeed = this.dropSpeed; // Store current drop speed
+                this.dropSpeed = 50; // Fast drop speed same as keyboard 'S'
+            } else if (!dpadDown && this.gamepadDownPressed) {
+                console.log('🎮 D-pad Down released - restoring normal drop speed!');
+                this.gamepadDownPressed = false;
+                this.dropSpeed = this.originalDropSpeed; // Restore original speed
+                this.calculateDropSpeed(); // Recalculate proper speed for current level
+            }
+            if (dpadUp) { // D-pad Up (hard drop)
+                console.log('🎮 D-pad Up detected!');
+                this.hardDrop();
+            }
+        }
+        
+        // Pause toggle
+        if (wasPressed(9)) { // Start button
+            this.togglePause();
+        }
+        
+        // Store current state for next frame
+        this.lastGamepadState = { ...currentState };
+    }
+    
     gameLoop() {
         const now = Date.now();
         const deltaTime = now - this.lastTime;
         this.lastTime = now;
+        
+        // Update gamepad input
+        this.updateGamepad();
         
         if (this.playing && !this.paused && !this.gameOver) {
             this.dropTime += deltaTime;

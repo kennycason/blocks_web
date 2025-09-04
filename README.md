@@ -28,6 +28,14 @@ Compiled with PureBasic 3.94
 </tr>
 <tr>
     <td width="50%">
+        <img src="/screenshots/screenshot_new4.png"/>
+    </td>
+    <td width="50%">
+        <img src="/screenshots/screenshot_new5.png"/>
+    </td>
+</tr>
+<tr>
+    <td width="50%">
         <img src="/screenshots/screenshot.JPG"/>
     </td>
     <td width="50%">
