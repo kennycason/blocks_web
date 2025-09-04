@@ -53,7 +53,25 @@
             height: 100%;
             pointer-events: none;
             z-index: -1;
-            display: none; /* Hidden by default */
+            display: block; /* Always show container */
+        }
+        
+        /* Hide all abstract elements by default */
+        .geometric-patterns,
+        .spiral-1, .spiral-2, .spiral-3,
+        .chaos-particles,
+        .crystal-formations,
+        .energy-waves,
+        .portal-rings,
+        .lightning-storm,
+        .aurora-borealis,
+        .meteor-shower,
+        .dimensional-rifts,
+        .plasma-field,
+        .void-tentacles,
+        .fractal-trees,
+        .time-distortion {
+            display: none !important;
         }
         
         /* Show bg elements only for sunny-day style */
@@ -289,6 +307,229 @@
             animation: galaxyRotate 20s linear infinite, galaxyBreathe 8s ease-in-out infinite;
         }
         
+        /* Geometric Patterns */
+        .geometric-patterns {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 49%, rgba(255, 255, 255, 0.1) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(255, 255, 255, 0.1) 49%, rgba(255, 255, 255, 0.1) 51%, transparent 52%),
+                conic-gradient(from 0deg, transparent, rgba(138, 43, 226, 0.2), transparent, rgba(75, 0, 130, 0.2), transparent);
+            background-size: 100px 100px, 100px 100px, 200px 200px;
+            animation: geometricShift 15s linear infinite;
+        }
+        
+        /* Spirals */
+        .spiral-1, .spiral-2, .spiral-3 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.3), transparent, rgba(138, 43, 226, 0.4), transparent);
+            mask: radial-gradient(circle, transparent 30%, black 32%, black 90%, transparent 92%);
+        }
+        
+        .spiral-1 {
+            top: 20%;
+            left: 10%;
+            animation: spiralRotate 8s linear infinite;
+        }
+        
+        .spiral-2 {
+            top: 60%;
+            right: 20%;
+            animation: spiralRotate 12s linear infinite reverse;
+        }
+        
+        .spiral-3 {
+            top: 10%;
+            right: 10%;
+            animation: spiralRotate 6s linear infinite;
+            transform: scale(0.7);
+        }
+        
+        /* Chaos Particles */
+        .chaos-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(2px 2px at 100px 200px, rgba(255, 0, 255, 0.8), transparent),
+                radial-gradient(3px 3px at 300px 100px, rgba(0, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 500px 300px, rgba(255, 255, 0, 0.8), transparent),
+                radial-gradient(2px 2px at 200px 400px, rgba(255, 0, 0, 0.8), transparent),
+                radial-gradient(1px 1px at 600px 150px, rgba(0, 255, 0, 0.8), transparent),
+                radial-gradient(3px 3px at 50px 350px, rgba(0, 0, 255, 0.8), transparent);
+            animation: chaosFloat 4s ease-in-out infinite;
+        }
+        
+        /* Crystal Formations */
+        .crystal-formations {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(60deg, transparent 40%, rgba(173, 216, 230, 0.3) 42%, rgba(173, 216, 230, 0.3) 43%, transparent 45%),
+                linear-gradient(120deg, transparent 40%, rgba(221, 160, 221, 0.3) 42%, rgba(221, 160, 221, 0.3) 43%, transparent 45%),
+                linear-gradient(-60deg, transparent 40%, rgba(240, 248, 255, 0.3) 42%, rgba(240, 248, 255, 0.3) 43%, transparent 45%);
+            background-size: 80px 140px, 100px 160px, 120px 180px;
+            animation: crystalShimmer 6s ease-in-out infinite;
+        }
+        
+        /* Energy Waves */
+        .energy-waves {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 800px 100px at 50% 20%, rgba(255, 255, 255, 0.1), transparent),
+                radial-gradient(ellipse 600px 80px at 50% 50%, rgba(138, 43, 226, 0.2), transparent),
+                radial-gradient(ellipse 900px 120px at 50% 80%, rgba(75, 0, 130, 0.15), transparent);
+            animation: energyPulse 5s ease-in-out infinite;
+        }
+        
+        /* Portal Rings */
+        .portal-rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: 
+                radial-gradient(circle, transparent 30%, rgba(255, 255, 255, 0.1) 31%, rgba(255, 255, 255, 0.1) 33%, transparent 34%),
+                radial-gradient(circle, transparent 50%, rgba(138, 43, 226, 0.2) 51%, rgba(138, 43, 226, 0.2) 53%, transparent 54%),
+                radial-gradient(circle, transparent 70%, rgba(75, 0, 130, 0.3) 71%, rgba(75, 0, 130, 0.3) 73%, transparent 74%);
+            animation: portalSpin 10s linear infinite;
+        }
+        
+        /* Lightning Storm */
+        .lightning-storm {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 99%, rgba(255, 255, 255, 0.9) 99.5%, transparent 100%),
+                linear-gradient(-120deg, transparent 98%, rgba(173, 216, 230, 0.8) 99%, transparent 100%),
+                linear-gradient(75deg, transparent 97%, rgba(255, 255, 0, 0.7) 98%, transparent 99%);
+            background-size: 300px 400px, 450px 300px, 200px 500px;
+            animation: lightningFlash 3s ease-in-out infinite;
+        }
+        
+        /* Aurora Borealis */
+        .aurora-borealis {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: 
+                linear-gradient(90deg, transparent, rgba(0, 255, 127, 0.3), rgba(138, 43, 226, 0.3), rgba(0, 191, 255, 0.3), transparent),
+                linear-gradient(85deg, transparent, rgba(255, 20, 147, 0.2), rgba(0, 250, 154, 0.2), transparent),
+                linear-gradient(95deg, transparent, rgba(30, 144, 255, 0.2), rgba(255, 105, 180, 0.2), transparent);
+            background-size: 400px 100%, 350px 80%, 500px 120%;
+            animation: auroraWave 8s ease-in-out infinite;
+        }
+        
+        /* Meteor Shower */
+        .meteor-shower {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(1px 20px at 100px 50px, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 30px at 300px 150px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(1px 25px at 500px 80px, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(1px 15px at 200px 250px, rgba(255, 255, 255, 0.5), transparent);
+            animation: meteorFall 4s linear infinite;
+        }
+        
+        /* Dimensional Rifts */
+        .dimensional-rifts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 48%, rgba(255, 0, 255, 0.4) 49%, rgba(0, 255, 255, 0.4) 50%, rgba(255, 0, 255, 0.4) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 47%, rgba(255, 255, 0, 0.3) 48%, rgba(255, 0, 0, 0.3) 50%, rgba(255, 255, 0, 0.3) 52%, transparent 53%);
+            background-size: 80px 200px, 120px 180px;
+            animation: riftTear 6s ease-in-out infinite;
+        }
+        
+        /* Plasma Field */
+        .plasma-field {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 300px 100px at 20% 30%, rgba(255, 0, 255, 0.3), transparent),
+                radial-gradient(ellipse 200px 150px at 70% 60%, rgba(0, 255, 255, 0.3), transparent),
+                radial-gradient(ellipse 250px 80px at 50% 80%, rgba(255, 255, 0, 0.3), transparent);
+            animation: plasmaFlow 5s ease-in-out infinite;
+        }
+        
+        /* Void Tentacles */
+        .void-tentacles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 20px 200px at 10% 50%, rgba(75, 0, 130, 0.6), transparent),
+                radial-gradient(ellipse 15px 180px at 90% 30%, rgba(138, 43, 226, 0.5), transparent),
+                radial-gradient(ellipse 25px 220px at 70% 70%, rgba(72, 61, 139, 0.4), transparent),
+                radial-gradient(ellipse 18px 160px at 30% 80%, rgba(106, 90, 205, 0.5), transparent);
+            animation: tentacleWrithe 7s ease-in-out infinite;
+        }
+        
+        /* Fractal Trees */
+        .fractal-trees {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                conic-gradient(from 0deg at 20% 80%, transparent 60deg, rgba(50, 205, 50, 0.4) 120deg, transparent 180deg),
+                conic-gradient(from 45deg at 80% 70%, transparent 30deg, rgba(34, 139, 34, 0.3) 90deg, transparent 150deg),
+                conic-gradient(from 90deg at 50% 90%, transparent 45deg, rgba(46, 125, 50, 0.5) 135deg, transparent 225deg);
+            animation: fractalGrow 9s ease-in-out infinite;
+        }
+        
+        /* Time Distortion */
+        .time-distortion {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.1), transparent, rgba(255, 255, 255, 0.2), transparent),
+                radial-gradient(circle at 50% 50%, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            background-size: 200px 200px, 300px 300px;
+            animation: timeWarp 12s linear infinite;
+        }
+        
         /* Keyframe animations */
         @keyframes sunGlow {
             0% { box-shadow: 0 0 30px #FFD700, 0 0 60px #FFA500; }
@@ -339,6 +580,207 @@
         @keyframes galaxyBreathe {
             0%, 100% { transform: scale(1) rotate(var(--rotation, 0deg)); }
             50% { transform: scale(1.15) rotate(var(--rotation, 0deg)); }
+        }
+        
+        @keyframes geometricShift {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            25% { transform: translateX(50px) translateY(-30px) rotate(90deg); }
+            50% { transform: translateX(0) translateY(-60px) rotate(180deg); }
+            75% { transform: translateX(-50px) translateY(-30px) rotate(270deg); }
+            100% { transform: translateX(0) translateY(0) rotate(360deg); }
+        }
+        
+        @keyframes spiralRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        
+        @keyframes chaosFloat {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg); 
+                filter: hue-rotate(0deg);
+            }
+            25% { 
+                transform: scale(1.2) rotate(90deg); 
+                filter: hue-rotate(90deg);
+            }
+            50% { 
+                transform: scale(0.8) rotate(180deg); 
+                filter: hue-rotate(180deg);
+            }
+            75% { 
+                transform: scale(1.1) rotate(270deg); 
+                filter: hue-rotate(270deg);
+            }
+        }
+        
+        @keyframes crystalShimmer {
+            0%, 100% { 
+                opacity: 0.6; 
+                transform: scale(1); 
+                filter: brightness(1);
+            }
+            33% { 
+                opacity: 0.9; 
+                transform: scale(1.05); 
+                filter: brightness(1.3);
+            }
+            66% { 
+                opacity: 0.4; 
+                transform: scale(0.95); 
+                filter: brightness(0.8);
+            }
+        }
+        
+        @keyframes energyPulse {
+            0%, 100% { 
+                transform: scaleY(1) scaleX(1); 
+                opacity: 0.3; 
+            }
+            50% { 
+                transform: scaleY(1.3) scaleX(0.8); 
+                opacity: 0.7; 
+            }
+        }
+        
+        @keyframes portalSpin {
+            0% { 
+                transform: translate(-50%, -50%) rotate(0deg) scale(1);
+                filter: hue-rotate(0deg);
+            }
+            25% { 
+                transform: translate(-50%, -50%) rotate(90deg) scale(1.1);
+                filter: hue-rotate(90deg);
+            }
+            50% { 
+                transform: translate(-50%, -50%) rotate(180deg) scale(1);
+                filter: hue-rotate(180deg);
+            }
+            75% { 
+                transform: translate(-50%, -50%) rotate(270deg) scale(0.9);
+                filter: hue-rotate(270deg);
+            }
+            100% { 
+                transform: translate(-50%, -50%) rotate(360deg) scale(1);
+                filter: hue-rotate(360deg);
+            }
+        }
+        
+        @keyframes lightningFlash {
+            0%, 90%, 100% { opacity: 0; }
+            5%, 15% { opacity: 1; }
+            20%, 80% { opacity: 0; }
+            85% { opacity: 0.7; }
+        }
+        
+        @keyframes auroraWave {
+            0%, 100% { 
+                transform: translateX(0) skewX(0deg); 
+                opacity: 0.4; 
+            }
+            25% { 
+                transform: translateX(50px) skewX(5deg); 
+                opacity: 0.7; 
+            }
+            50% { 
+                transform: translateX(-30px) skewX(-3deg); 
+                opacity: 0.5; 
+            }
+            75% { 
+                transform: translateX(20px) skewX(2deg); 
+                opacity: 0.8; 
+            }
+        }
+        
+        @keyframes meteorFall {
+            0% { 
+                transform: translateX(-100px) translateY(-100px); 
+                opacity: 0; 
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateX(200px) translateY(200px); 
+                opacity: 0; 
+            }
+        }
+        
+        @keyframes riftTear {
+            0%, 100% { 
+                transform: scaleX(1) scaleY(1); 
+                opacity: 0.3; 
+                filter: hue-rotate(0deg);
+            }
+            50% { 
+                transform: scaleX(1.2) scaleY(0.8); 
+                opacity: 0.8; 
+                filter: hue-rotate(180deg);
+            }
+        }
+        
+        @keyframes plasmaFlow {
+            0%, 100% { 
+                transform: rotate(0deg) scale(1); 
+                filter: hue-rotate(0deg);
+            }
+            33% { 
+                transform: rotate(120deg) scale(1.1); 
+                filter: hue-rotate(120deg);
+            }
+            66% { 
+                transform: rotate(240deg) scale(0.9); 
+                filter: hue-rotate(240deg);
+            }
+        }
+        
+        @keyframes tentacleWrithe {
+            0%, 100% { 
+                transform: skewX(0deg) skewY(0deg); 
+            }
+            25% { 
+                transform: skewX(10deg) skewY(-5deg); 
+            }
+            50% { 
+                transform: skewX(-8deg) skewY(8deg); 
+            }
+            75% { 
+                transform: skewX(5deg) skewY(-10deg); 
+            }
+        }
+        
+        @keyframes fractalGrow {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 0.6;
+            }
+            50% { 
+                transform: scale(1.3) rotate(180deg); 
+                opacity: 0.9;
+            }
+        }
+        
+        @keyframes timeWarp {
+            0% { 
+                transform: rotate(0deg) scale(1); 
+                filter: blur(0px);
+            }
+            25% { 
+                transform: rotate(90deg) scale(1.1); 
+                filter: blur(1px);
+            }
+            50% { 
+                transform: rotate(180deg) scale(0.9); 
+                filter: blur(2px);
+            }
+            75% { 
+                transform: rotate(270deg) scale(1.05); 
+                filter: blur(1px);
+            }
+            100% { 
+                transform: rotate(360deg) scale(1); 
+                filter: blur(0px);
+            }
         }
 
         .main-content {
@@ -848,6 +1290,26 @@
         <div class="stars"></div>
         <div class="nebula"></div>
         <div class="galaxy-center"></div>
+        
+        <!-- Abstract Elements -->
+        <div class="geometric-patterns"></div>
+        <div class="spiral-1"></div>
+        <div class="spiral-2"></div>
+        <div class="spiral-3"></div>
+        <div class="chaos-particles"></div>
+        <div class="crystal-formations"></div>
+        <div class="energy-waves"></div>
+        <div class="portal-rings"></div>
+        
+        <!-- New Effects -->
+        <div class="lightning-storm"></div>
+        <div class="aurora-borealis"></div>
+        <div class="meteor-shower"></div>
+        <div class="dimensional-rifts"></div>
+        <div class="plasma-field"></div>
+        <div class="void-tentacles"></div>
+        <div class="fractal-trees"></div>
+        <div class="time-distortion"></div>
     </div>
 
     <div class="menu-bar">

@@ -28,7 +28,7 @@ class BlocksGame {
         // Timing
         this.lastTime = 0;
         this.dropTime = 0;
-        this.dropSpeed = 350; // milliseconds
+        this.dropSpeed = 800; // milliseconds - much slower starting speed
         this.moveTime = 0;
         this.moveSpeed = 60; // Fast repeat rate
         this.initialMoveDelay = 110; // Short initial delay before repeat starts (slightly less sensitive)
@@ -79,13 +79,18 @@ class BlocksGame {
         
         // Environment evolution system
         this.evolutionProgress = 0; // 0-100% through complete evolution cycle
-        this.maxEvolutionSteps = 50; // Total pieces needed for full cycle
+        this.maxEvolutionSteps = 100; // Total pieces needed for full cycle (longer journey!)
         this.evolutionPhases = [
-            { name: 'sunny-day', start: 0, end: 25 },
-            { name: 'sunset', start: 20, end: 45 },
-            { name: 'night', start: 40, end: 65 },
-            { name: 'space', start: 60, end: 85 },
-            { name: 'dawn', start: 80, end: 100 }
+            { name: 'sunny-day', start: 0, end: 12 },
+            { name: 'sunset', start: 10, end: 22 },
+            { name: 'night', start: 20, end: 32 },
+            { name: 'space', start: 30, end: 42 },
+            { name: 'nebula-storm', start: 40, end: 52 },
+            { name: 'geometric-void', start: 50, end: 62 },
+            { name: 'spiral-dimension', start: 60, end: 72 },
+            { name: 'abstract-chaos', start: 70, end: 82 },
+            { name: 'crystal-realm', start: 80, end: 92 },
+            { name: 'returning-dawn', start: 90, end: 100 }
         ];
         
         // Sprite sheet for piece textures
@@ -383,14 +388,25 @@ class BlocksGame {
         const newLevel = Math.floor(this.lines / 10);
         if (newLevel > this.level) {
             this.level = newLevel;
-            if (this.dropSpeed >= 75) {
-                this.dropSpeed -= 25;
-            } else if (this.dropSpeed > 30) {
-                this.dropSpeed -= 2;
-            }
-            if (this.dropSpeed < 30) {
-                this.dropSpeed = 30;
-            }
+            this.calculateDropSpeed();
+            console.log(`📈 Level ${this.level}: Drop speed now ${this.dropSpeed}ms`);
+        }
+    }
+    
+    calculateDropSpeed() {
+        // Calculate the correct drop speed for current level
+        if (this.level <= 10) {
+            // Levels 0-10: Decrease by 50ms each level
+            this.dropSpeed = Math.max(300, 800 - (this.level * 50));
+        } else if (this.level <= 20) {
+            // Levels 11-20: Decrease by 20ms each level  
+            this.dropSpeed = Math.max(100, 300 - ((this.level - 10) * 20));
+        } else if (this.level <= 29) {
+            // Levels 21-29: Very small decreases
+            this.dropSpeed = Math.max(50, 100 - ((this.level - 20) * 5));
+        } else {
+            // Level 30+: Cap at reasonable speed
+            this.dropSpeed = 50;
         }
     }
     
@@ -711,7 +727,7 @@ class BlocksGame {
         this.score = 0;
         this.lines = 0;
         this.level = 0;
-        this.dropSpeed = 350;
+        this.dropSpeed = 800;
         this.pieceStats = {};
         this.totalPieces = 0;
         
@@ -763,11 +779,11 @@ class BlocksGame {
     }
     
     evolveEnvironment() {
-        // Advance evolution by 2% each piece (50 pieces = full cycle)
-        this.evolutionProgress += 2;
+        // Advance evolution by 1% each piece (100 pieces = full cycle)
+        this.evolutionProgress += 1;
         
         // Cycle back to beginning after 100%
-        if (this.evolutionProgress > 100) {
+        if (this.evolutionProgress >= 100) {
             this.evolutionProgress = 0;
         }
         
@@ -783,6 +799,7 @@ class BlocksGame {
         this.morphClouds(progress);
         this.morphSurface(progress);
         this.morphAtmosphere(progress);
+        this.morphAbstractElements(progress);
         
         console.log(`🌍 Environment evolution: ${progress.toFixed(1)}%`);
     }
@@ -832,38 +849,76 @@ class BlocksGame {
     
     morphSky(progress) {
         const body = document.body;
-        
-        // Sky color progression through day/night cycle
         let gradient;
         
-        if (progress < 25) {
-            // Day: Blue sky
+        if (progress < 12) {
+            // Sunny Day: Blue sky
             gradient = `linear-gradient(to bottom, 
                 #87CEEB 0%, #98D8E8 30%, #B6E5F0 60%, #32CD32 85%, #228B22 100%)`;
-        } else if (progress < 50) {
+        } else if (progress < 22) {
             // Sunset: Orange/pink sky
-            const t = (progress - 25) / 25;
+            const t = (progress - 12) / 10;
             gradient = `linear-gradient(to bottom, 
                 ${this.lerpColor('#87CEEB', '#FF6B35', t)} 0%, 
                 ${this.lerpColor('#98D8E8', '#FF8E53', t)} 30%, 
                 ${this.lerpColor('#B6E5F0', '#FFB07A', t)} 60%, 
                 #32CD32 85%, #228B22 100%)`;
-        } else if (progress < 75) {
+        } else if (progress < 32) {
             // Night: Dark sky
-            const t = (progress - 50) / 25;
+            const t = (progress - 22) / 10;
             gradient = `linear-gradient(to bottom, 
                 ${this.lerpColor('#FF6B35', '#191970', t)} 0%, 
                 ${this.lerpColor('#FF8E53', '#1E1E3F', t)} 30%, 
                 ${this.lerpColor('#FFB07A', '#0F0F2A', t)} 60%, 
                 #1A4E1A 85%, #0F2F0F 100%)`;
-        } else {
+        } else if (progress < 42) {
             // Space: Deep space
-            const t = (progress - 75) / 25;
+            const t = (progress - 32) / 10;
             gradient = `radial-gradient(ellipse at center, 
                 ${this.lerpColor('#191970', '#1a0033', t)} 0%, 
                 ${this.lerpColor('#1E1E3F', '#0d0019', t)} 30%, 
                 ${this.lerpColor('#0F0F2A', '#000000', t)} 60%, 
                 #000000 100%)`;
+        } else if (progress < 52) {
+            // Nebula Storm: Purple/magenta space
+            const t = (progress - 42) / 10;
+            gradient = `radial-gradient(ellipse at center, 
+                ${this.lerpColor('#1a0033', '#4B0082', t)} 0%, 
+                ${this.lerpColor('#0d0019', '#8B008B', t)} 30%, 
+                ${this.lerpColor('#000000', '#4B0082', t)} 60%, 
+                #1a0033 100%)`;
+        } else if (progress < 62) {
+            // Geometric Void: Sharp contrasts
+            const t = (progress - 52) / 10;
+            gradient = `conic-gradient(from 0deg, 
+                ${this.lerpColor('#4B0082', '#000000', t)}, 
+                ${this.lerpColor('#8B008B', '#FFFFFF', t)}, 
+                ${this.lerpColor('#4B0082', '#000000', t)}, 
+                ${this.lerpColor('#1a0033', '#808080', t)})`;
+        } else if (progress < 72) {
+            // Spiral Dimension: Swirling patterns
+            const t = (progress - 62) / 10;
+            gradient = `conic-gradient(from ${t * 360}deg, 
+                #FF00FF, #00FFFF, #FFFF00, #FF0000, #0000FF, #00FF00, #FF00FF)`;
+        } else if (progress < 82) {
+            // Abstract Chaos: Wild colors
+            const t = (progress - 72) / 10;
+            gradient = `radial-gradient(ellipse at ${20 + t * 60}% ${30 + t * 40}%, 
+                #FF1493 0%, #00CED1 30%, #FFD700 60%, #8A2BE2 100%)`;
+        } else if (progress < 92) {
+            // Crystal Realm: Crystalline patterns
+            const t = (progress - 82) / 10;
+            gradient = `linear-gradient(${t * 180}deg, 
+                #E6E6FA 0%, #DDA0DD 25%, #DA70D6 50%, #C71585 75%, #B0E0E6 100%)`;
+        } else {
+            // Returning Dawn: Back to day
+            const t = (progress - 92) / 8;
+            gradient = `linear-gradient(to bottom, 
+                ${this.lerpColor('#E6E6FA', '#87CEEB', t)} 0%, 
+                ${this.lerpColor('#DDA0DD', '#98D8E8', t)} 30%, 
+                ${this.lerpColor('#DA70D6', '#B6E5F0', t)} 60%, 
+                ${this.lerpColor('#C71585', '#32CD32', t)} 85%, 
+                ${this.lerpColor('#B0E0E6', '#228B22', t)} 100%)`;
         }
         
         body.style.background = gradient;
@@ -974,6 +1029,135 @@ class BlocksGame {
         return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     }
     
+    morphAbstractElements(progress) {
+        // Get all abstract elements
+        const geometric = document.querySelector('.geometric-patterns');
+        const spirals = document.querySelectorAll('.spiral-1, .spiral-2, .spiral-3');
+        const chaos = document.querySelector('.chaos-particles');
+        const crystals = document.querySelector('.crystal-formations');
+        const energy = document.querySelector('.energy-waves');
+        const portal = document.querySelector('.portal-rings');
+        
+        // Get new spectacular elements
+        const lightning = document.querySelector('.lightning-storm');
+        const aurora = document.querySelector('.aurora-borealis');
+        const meteors = document.querySelector('.meteor-shower');
+        const rifts = document.querySelector('.dimensional-rifts');
+        const plasma = document.querySelector('.plasma-field');
+        const tentacles = document.querySelector('.void-tentacles');
+        const fractals = document.querySelector('.fractal-trees');
+        const timeWarp = document.querySelector('.time-distortion');
+        
+        // Hide all abstract elements by default
+        [geometric, chaos, crystals, energy, portal, lightning, aurora, meteors, 
+         rifts, plasma, tentacles, fractals, timeWarp, ...spirals].forEach(el => {
+            if (el) el.style.display = 'none';
+        });
+        
+        // Weather effects during early phases
+        if (progress >= 15 && progress < 35) {
+            // Lightning storms during sunset/night transition
+            if (lightning) {
+                lightning.style.display = 'block';
+                const t = (progress - 15) / 20;
+                lightning.style.opacity = `${0.3 + Math.sin(t * Math.PI) * 0.4}`;
+            }
+        }
+        
+        if (progress >= 25 && progress < 45) {
+            // Aurora during night/space transition
+            if (aurora) {
+                aurora.style.display = 'block';
+                const t = (progress - 25) / 20;
+                aurora.style.opacity = `${0.4 + t * 0.5}`;
+            }
+        }
+        
+        if (progress >= 35 && progress < 55) {
+            // Meteor shower in space
+            if (meteors) {
+                meteors.style.display = 'block';
+                const t = (progress - 35) / 20;
+                meteors.style.opacity = `${0.5 + Math.sin(t * Math.PI * 2) * 0.3}`;
+            }
+        }
+        
+        if (progress >= 50 && progress < 62) {
+            // Geometric Void phase with dimensional rifts
+            if (geometric) {
+                geometric.style.display = 'block';
+                const t = (progress - 50) / 12;
+                geometric.style.opacity = `${Math.sin(t * Math.PI) * 0.8}`;
+            }
+            if (rifts) {
+                rifts.style.display = 'block';
+                const t = (progress - 50) / 12;
+                rifts.style.opacity = `${0.4 + t * 0.4}`;
+            }
+        } else if (progress >= 60 && progress < 72) {
+            // Spiral Dimension phase with time distortion
+            spirals.forEach((spiral, index) => {
+                if (spiral) {
+                    spiral.style.display = 'block';
+                    const t = (progress - 60) / 12;
+                    spiral.style.opacity = `${0.3 + Math.sin(t * Math.PI + index) * 0.5}`;
+                    spiral.style.transform = `scale(${0.5 + t * 0.8}) rotate(${t * 720 + index * 120}deg)`;
+                }
+            });
+            if (timeWarp) {
+                timeWarp.style.display = 'block';
+                const t = (progress - 60) / 12;
+                timeWarp.style.opacity = `${0.2 + t * 0.5}`;
+            }
+        } else if (progress >= 70 && progress < 82) {
+            // Abstract Chaos phase with plasma and void tentacles
+            if (chaos) {
+                chaos.style.display = 'block';
+                const t = (progress - 70) / 12;
+                chaos.style.opacity = `${0.5 + Math.sin(t * Math.PI * 3) * 0.4}`;
+                chaos.style.transform = `scale(${0.8 + Math.sin(t * Math.PI * 2) * 0.4})`;
+            }
+            if (plasma) {
+                plasma.style.display = 'block';
+                const t = (progress - 70) / 12;
+                plasma.style.opacity = `${0.4 + Math.sin(t * Math.PI * 1.5) * 0.3}`;
+            }
+            if (tentacles) {
+                tentacles.style.display = 'block';
+                const t = (progress - 70) / 12;
+                tentacles.style.opacity = `${0.3 + t * 0.4}`;
+            }
+        } else if (progress >= 80 && progress < 92) {
+            // Crystal Realm phase with fractal trees
+            if (crystals) {
+                crystals.style.display = 'block';
+                const t = (progress - 80) / 12;
+                crystals.style.opacity = `${0.4 + t * 0.5}`;
+                crystals.style.transform = `rotate(${t * 180}deg) scale(${0.9 + t * 0.2})`;
+            }
+            if (energy) {
+                energy.style.display = 'block';
+                const t = (progress - 80) / 12;
+                energy.style.opacity = `${0.3 + Math.sin(t * Math.PI * 2) * 0.3}`;
+            }
+            if (fractals) {
+                fractals.style.display = 'block';
+                const t = (progress - 80) / 12;
+                fractals.style.opacity = `${0.5 + t * 0.3}`;
+            }
+        }
+        
+        // Portal rings appear during major transitions
+        if ((progress >= 48 && progress <= 54) || (progress >= 68 && progress <= 74) || (progress >= 88 && progress <= 94)) {
+            if (portal) {
+                portal.style.display = 'block';
+                const intensity = Math.sin((progress % 6) * Math.PI / 6);
+                portal.style.opacity = `${0.2 + intensity * 0.6}`;
+                portal.style.transform = `translate(-50%, -50%) scale(${0.8 + intensity * 0.4}) rotate(${progress * 10}deg)`;
+            }
+        }
+    }
+    
     setupEventListeners() {
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
@@ -1012,7 +1196,7 @@ class BlocksGame {
                     break;
                 case 's':
                 case 'S':
-                    this.dropSpeed = 35; // Fast drop (10x faster than normal ~350ms, much safer than old 10ms)
+                    this.dropSpeed = 50; // Fast drop - safe but still fast
                     break;
                 case 'w':
                 case 'W':
@@ -1070,9 +1254,8 @@ class BlocksGame {
                     break;
                 case 's':
                 case 'S':
-                    // Reset drop speed when fast drop key is released
-                    const baseSpeed = 350 - (25 * this.level);
-                    this.dropSpeed = Math.max(baseSpeed, 30);
+                    // Reset drop speed when fast drop key is released - restore proper speed for current level
+                    this.calculateDropSpeed();
                     break;
             }
         });
