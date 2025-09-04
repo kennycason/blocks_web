@@ -312,12 +312,12 @@ class BlocksGame {
         
         // Message arrays for each line clear count
         const messageArrays = {
-            1: ['NICE!', 'GOOD!', 'WOAH!', 'SINGLE!', 'ONE!'],
-            2: ['DOUBLE!', 'X2!!', 'TWICE!', 'PAIR!', 'SWEET!'],
-            3: ['TRIPLE!', 'WHAMMO!', 'GREAT!', 'THREE!', 'AMAZING!'],
+            1: ['SINGLE!', 'GOOD!', 'WOAH!',  'ONE!'],
+            2: ['DOUBLE!', 'X2!', 'TWO!', 'PAIR!', 'SWEET!'],
+            3: ['TRIPLE!', 'WHAMMO!', 'THREE!', 'AMAZING!'],
             4: ['TETRIS!', 'AWESOME!', 'QUAD!', 'FOUR!', 'FANTASTIC!'],
-            5: ['PENTA!', 'ALMOST!', 'FIVE!', 'INCREDIBLE!', 'SUPER!'],
-            6: ['HEXA!', 'BLOCK!', 'SIX!', 'ULTIMATE!', 'LEGENDARY!', 'EPIC!']
+            5: ['PENTRIS!', 'FIVE!', 'INCREDIBLE!', 'SUPER!'],
+            6: ['HEXTRIS!', 'SIX!', 'ULTIMATE!', 'LEGENDARY!', 'EPIC!']
         };
         
         if (linesCleared === 1) {
