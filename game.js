@@ -31,7 +31,7 @@ class BlocksGame {
         this.dropSpeed = 350; // milliseconds
         this.moveTime = 0;
         this.moveSpeed = 60; // Fast repeat rate
-        this.initialMoveDelay = 100; // Short initial delay before repeat starts
+        this.initialMoveDelay = 110; // Short initial delay before repeat starts (slightly less sensitive)
         this.rotateTime = 0;
         this.rotateSpeed = 150;
         
@@ -313,8 +313,10 @@ class BlocksGame {
         
         if (linesCleared === 1) {
             bonus = 150;
+            message = 'WOAH!'
         } else if (linesCleared === 2) {
             bonus = 350;
+             message = 'X2!!'
         } else if (linesCleared === 3) {
             bonus = 2500;
             message = this.mode === 0 ? 'WHAMMO!' : 'GREAT!';
@@ -593,9 +595,9 @@ class BlocksGame {
     resetHighScores() {
         if (confirm('Are you sure you want to reset all high scores?')) {
             this.highScores = [
-                { score: 0, lines: 0, isEmpty: true },
-                { score: 0, lines: 0, isEmpty: true },
-                { score: 0, lines: 0, isEmpty: true }
+                { score: 0, lines: 0, name: '', isEmpty: true },
+                { score: 0, lines: 0, name: '', isEmpty: true },
+                { score: 0, lines: 0, name: '', isEmpty: true }
             ];
             localStorage.removeItem('blocksHighScores');
             this.updateHighScoresDisplay();
@@ -896,9 +898,9 @@ class BlocksGame {
         
         // Return default empty high scores
         return [
-            { score: 0, lines: 0, isEmpty: true },
-            { score: 0, lines: 0, isEmpty: true },
-            { score: 0, lines: 0, isEmpty: true }
+            { score: 0, lines: 0, name: '', isEmpty: true },
+            { score: 0, lines: 0, name: '', isEmpty: true },
+            { score: 0, lines: 0, name: '', isEmpty: true }
         ];
     }
     
@@ -911,7 +913,6 @@ class BlocksGame {
     }
     
     checkAndUpdateHighScore() {
-        const currentScore = { score: this.score, lines: this.lines, isEmpty: false };
         let isNewHighScore = false;
         
         // Check if current score qualifies for top 3
@@ -921,6 +922,15 @@ class BlocksGame {
             // If this slot is empty or current score is higher
             if (existing.isEmpty || this.score > existing.score || 
                 (this.score === existing.score && this.lines > existing.lines)) {
+                
+                // Get player name
+                const name = prompt('New High Score! Enter your name:', '') || 'Anonymous';
+                const currentScore = { 
+                    score: this.score, 
+                    lines: this.lines, 
+                    name: name.substring(0, 10), // Limit to 10 characters
+                    isEmpty: false 
+                };
                 
                 // Shift existing scores down
                 for (let j = 2; j > i; j--) {
@@ -956,12 +966,14 @@ class BlocksGame {
                     <span class="rank">${i + 1}.</span>
                     <span class="score">-----</span>
                     <span class="lines">-----</span>
+                    <span class="name">-----</span>
                 </div>`;
             } else {
                 html += `<div class="hiscore-entry">
                     <span class="rank">${i + 1}.</span>
                     <span class="score">${hs.score.toLocaleString()}</span>
                     <span class="lines">${hs.lines}</span>
+                    <span class="name">${hs.name}</span>
                 </div>`;
             }
         }
