@@ -65,7 +65,8 @@
 
         .hiscores-section {
             flex: 1;
-            max-width: 50%;
+            max-width: 60%;
+            min-width: 200px;
         }
 
         .controls-section {
@@ -127,13 +128,43 @@
             margin-bottom: 10px;
             font-size: 14px;
         }
+        
+        .hiscore-entry {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+        }
+        
+        .hiscore-entry .rank {
+            margin-right: 8px;
+            color: #ffff00;
+            font-weight: bold;
+            min-width: 20px;
+        }
+        
+        .hiscore-entry .score {
+            margin-right: 12px;
+            color: #fff;
+            min-width: 50px;
+        }
+        
+        .hiscore-entry .lines {
+            color: #ccc;
+            min-width: 30px;
+        }
 
         .histogram {
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid #fff;
             padding: 15px;
-            height: 600px;
-            overflow: hidden;
+            height: auto;
+            min-height: 100px;
+            max-height: 600px;
+            overflow: visible;
             width: 240px;
         }
 
@@ -349,8 +380,8 @@
         <div class="hiscores-section">
             <div class="hiscores">
                 <h3>HI-SCORES</h3>
-                <div id="topScores">
-                    <div><strong>Current:</strong> <span id="currentHiScore">0</span> - <span id="currentHiScoreName"></span></div>
+                <div class="hiscores-list">
+                    <!-- High scores will be populated by JavaScript -->
                 </div>
             </div>
         </div>

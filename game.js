@@ -43,11 +43,34 @@ class BlocksGame {
         this.lastMoveDirection = null;
         this.moveStartTime = 0;
         
+        // Slide/Wall Kick system - easily configurable
+        this.slideConfig = {
+            enabled: true,
+            maxSlideDistance: 3, // How far pieces can slide (in blocks) - increased from 2
+            slideAttempts: [
+                [0, 0],   // Try original position first
+                [-1, 0],  // Try left
+                [1, 0],   // Try right  
+                [-2, 0],  // Try further left
+                [2, 0],   // Try further right
+                [0, -1],  // Try up
+                [-1, -1], // Try left-up
+                [1, -1],  // Try right-up
+                [-3, 0],  // Try max left
+                [3, 0],   // Try max right
+                [0, -2],  // Try further up
+                [-2, -1], // Try far left-up
+                [2, -1],  // Try far right-up
+                [-1, -2], // Try left-far up
+                [1, -2]   // Try right-far up
+            ]
+        };
+        
         // Piece statistics
         this.pieceStats = {};
         this.totalPieces = 0;
         
-        // High scores (stored in localStorage)
+        // High scores system
         this.highScores = this.loadHighScores();
         
         // Special message display
@@ -89,6 +112,7 @@ class BlocksGame {
         ];
         
         this.initGame();
+        this.updateHighScoresDisplay();
         this.setupEventListeners();
         this.gameLoop();
     }
@@ -220,8 +244,8 @@ class BlocksGame {
         if (this.isCollision(this.currentPiece, this.pieceX, this.pieceY)) {
             this.gameOver = true;
             this.playing = false;
+            this.checkAndUpdateHighScore();
             this.showGameOver();
-            this.saveHighScore();
         }
     }
     
@@ -349,7 +373,8 @@ class BlocksGame {
         
         const rotatedPiece = { ...this.currentPiece, blocks: rotatedBlocks };
         
-        if (!this.isCollision(rotatedPiece, this.pieceX, this.pieceY)) {
+        // Try rotation with slide/wall kick system
+        if (this.tryPlacement(rotatedPiece, this.pieceX, this.pieceY)) {
             this.currentPiece = rotatedPiece;
         }
     }
@@ -360,10 +385,50 @@ class BlocksGame {
         const newX = this.pieceX + dx;
         const newY = this.pieceY + dy;
         
-        if (!this.isCollision(this.currentPiece, newX, newY)) {
-            this.pieceX = newX;
-            this.pieceY = newY;
-            return true;
+        // For horizontal movement, try sliding if enabled
+        if (dx !== 0 && this.slideConfig.enabled) {
+            if (this.tryPlacement(this.currentPiece, newX, newY)) {
+                return true;
+            }
+        } else {
+            // Regular movement (vertical or slide disabled)
+            if (!this.isCollision(this.currentPiece, newX, newY)) {
+                this.pieceX = newX;
+                this.pieceY = newY;
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    tryPlacement(piece, targetX, targetY) {
+        if (!this.slideConfig.enabled) {
+            // If sliding is disabled, just try the exact position
+            if (!this.isCollision(piece, targetX, targetY)) {
+                this.pieceX = targetX;
+                this.pieceY = targetY;
+                return true;
+            }
+            return false;
+        }
+        
+        // Try each slide attempt in order of preference
+        for (let attempt of this.slideConfig.slideAttempts) {
+            const testX = targetX + attempt[0];
+            const testY = targetY + attempt[1];
+            
+            // Skip if slide distance exceeds maximum
+            if (Math.abs(attempt[0]) > this.slideConfig.maxSlideDistance || 
+                Math.abs(attempt[1]) > this.slideConfig.maxSlideDistance) {
+                continue;
+            }
+            
+            if (!this.isCollision(piece, testX, testY)) {
+                this.pieceX = testX;
+                this.pieceY = testY;
+                return true;
+            }
         }
         
         return false;
@@ -516,14 +581,7 @@ class BlocksGame {
         document.getElementById('currentLines').textContent = this.lines;
         document.getElementById('currentScore').textContent = this.score;
         
-        const hiScore = this.getCurrentHighScore();
-        document.getElementById('currentHiScore').textContent = hiScore.score;
-        document.getElementById('currentHiScoreName').textContent = hiScore.name;
-    }
-    
-    getCurrentHighScore() {
-        const key = `${this.mode}_${this.getSizeKey()}`;
-        return this.highScores[key] || { score: 0, name: '' };
+
     }
     
     getSizeKey() {
@@ -532,30 +590,15 @@ class BlocksGame {
         return 'big';
     }
     
-    saveHighScore() {
-        const currentHiScore = this.getCurrentHighScore();
-        if (this.score > currentHiScore.score) {
-            const name = prompt('New High Score! Enter your name:', '') || 'Anonymous';
-            const key = `${this.mode}_${this.getSizeKey()}`;
-            this.highScores[key] = { score: this.score, name: name.substring(0, 10) };
-            localStorage.setItem('blocksHighScores', JSON.stringify(this.highScores));
-            this.updateUI();
-        }
-    }
-    
-    loadHighScores() {
-        try {
-            return JSON.parse(localStorage.getItem('blocksHighScores')) || {};
-        } catch {
-            return {};
-        }
-    }
-    
     resetHighScores() {
         if (confirm('Are you sure you want to reset all high scores?')) {
-            this.highScores = {};
+            this.highScores = [
+                { score: 0, lines: 0, isEmpty: true },
+                { score: 0, lines: 0, isEmpty: true },
+                { score: 0, lines: 0, isEmpty: true }
+            ];
             localStorage.removeItem('blocksHighScores');
-            this.updateUI();
+            this.updateHighScoresDisplay();
         }
     }
     
@@ -772,9 +815,173 @@ class BlocksGame {
             }
         }
     }
+    
+    // Easy configuration methods for slide system
+    configureSlide(options = {}) {
+        if (options.enabled !== undefined) {
+            this.slideConfig.enabled = options.enabled;
+        }
+        if (options.maxSlideDistance !== undefined) {
+            this.slideConfig.maxSlideDistance = options.maxSlideDistance;
+        }
+        if (options.customAttempts !== undefined) {
+            this.slideConfig.slideAttempts = options.customAttempts;
+        }
+        
+        console.log('Slide configuration updated:', this.slideConfig);
+    }
+    
+    // Preset slide configurations
+    setSlidePreset(preset) {
+        switch(preset) {
+            case 'disabled':
+                this.configureSlide({ enabled: false });
+                break;
+            case 'minimal':
+                this.configureSlide({
+                    enabled: true,
+                    maxSlideDistance: 1,
+                    customAttempts: [
+                        [0, 0],   // Original position
+                        [-1, 0],  // Left
+                        [1, 0]    // Right
+                    ]
+                });
+                break;
+            case 'standard':
+                this.configureSlide({
+                    enabled: true,
+                    maxSlideDistance: 2,
+                    customAttempts: [
+                        [0, 0],   // Original position
+                        [-1, 0],  // Left
+                        [1, 0],   // Right
+                        [-2, 0],  // Further left
+                        [2, 0],   // Further right
+                        [0, -1]   // Up
+                    ]
+                });
+                break;
+            case 'aggressive':
+                this.configureSlide({
+                    enabled: true,
+                    maxSlideDistance: 3,
+                    customAttempts: [
+                        [0, 0],   // Original position
+                        [-1, 0], [1, 0],     // Adjacent sides
+                        [-2, 0], [2, 0],     // Further sides
+                        [0, -1],             // Up
+                        [-1, -1], [1, -1],   // Diagonal up
+                        [-3, 0], [3, 0],     // Max sides
+                        [0, -2],             // Further up
+                        [-2, -1], [2, -1]    // Far diagonal
+                    ]
+                });
+                break;
+            default:
+                console.log('Unknown preset. Available: disabled, minimal, standard, aggressive');
+        }
+    }
+    
+    // High Scores Management
+    loadHighScores() {
+        try {
+            const saved = localStorage.getItem('blocksHighScores');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        } catch (error) {
+            console.warn('Failed to load high scores:', error);
+        }
+        
+        // Return default empty high scores
+        return [
+            { score: 0, lines: 0, isEmpty: true },
+            { score: 0, lines: 0, isEmpty: true },
+            { score: 0, lines: 0, isEmpty: true }
+        ];
+    }
+    
+    saveHighScores() {
+        try {
+            localStorage.setItem('blocksHighScores', JSON.stringify(this.highScores));
+        } catch (error) {
+            console.warn('Failed to save high scores:', error);
+        }
+    }
+    
+    checkAndUpdateHighScore() {
+        const currentScore = { score: this.score, lines: this.lines, isEmpty: false };
+        let isNewHighScore = false;
+        
+        // Check if current score qualifies for top 3
+        for (let i = 0; i < 3; i++) {
+            const existing = this.highScores[i];
+            
+            // If this slot is empty or current score is higher
+            if (existing.isEmpty || this.score > existing.score || 
+                (this.score === existing.score && this.lines > existing.lines)) {
+                
+                // Shift existing scores down
+                for (let j = 2; j > i; j--) {
+                    this.highScores[j] = { ...this.highScores[j-1] };
+                }
+                
+                // Insert new high score
+                this.highScores[i] = currentScore;
+                isNewHighScore = true;
+                break;
+            }
+        }
+        
+        if (isNewHighScore) {
+            this.saveHighScores();
+            this.updateHighScoresDisplay();
+            this.showSpecialMessage(`NEW HIGH SCORE! #${this.highScores.findIndex(hs => 
+                hs.score === this.score && hs.lines === this.lines) + 1}`);
+        }
+        
+        return isNewHighScore;
+    }
+    
+    updateHighScoresDisplay() {
+        const hiscoresContainer = document.querySelector('.hiscores-list');
+        if (!hiscoresContainer) return;
+        
+        let html = '';
+        for (let i = 0; i < 3; i++) {
+            const hs = this.highScores[i];
+            if (hs.isEmpty) {
+                html += `<div class="hiscore-entry">
+                    <span class="rank">${i + 1}.</span>
+                    <span class="score">-----</span>
+                    <span class="lines">-----</span>
+                </div>`;
+            } else {
+                html += `<div class="hiscore-entry">
+                    <span class="rank">${i + 1}.</span>
+                    <span class="score">${hs.score.toLocaleString()}</span>
+                    <span class="lines">${hs.lines}</span>
+                </div>`;
+            }
+        }
+        hiscoresContainer.innerHTML = html;
+    }
 }
 
 // Initialize the game when the page loads
 window.addEventListener('load', () => {
-    new BlocksGame();
+    window.game = new BlocksGame(); // Make game accessible globally for easy tweaking
+    
+    // Quick access functions for console
+    window.slidePreset = (preset) => window.game.setSlidePreset(preset);
+    window.configSlide = (options) => window.game.configureSlide(options);
+    
+    console.log('🎮 Blocks game loaded!');
+    console.log('💡 Try these in console:');
+    console.log('   slidePreset("minimal")    - Basic sliding');
+    console.log('   slidePreset("standard")   - Default sliding (current)');
+    console.log('   slidePreset("aggressive") - Maximum sliding');
+    console.log('   slidePreset("disabled")   - No sliding');
+    console.log('   configSlide({enabled: false}) - Custom config');
 });
