@@ -8,7 +8,7 @@ Blocks is a tetris like game written in Purebasic.
 ## Blocks features 3 modes:		
 - <b>Baby Mode</b> - simple pieces constructed from 3 bricks.<br/>
 - <b>Normal Mode</b> - standard tetris pieces.<br/>
-- <b>Blocks Mode</b> - pieces constructed from 1 - 6 bricks. 27 different pieces, including a randomly generated piece that can take on bizzare shapes. In this mode it is possible to clear 6 lines at once, earning yourself a "Block." I recommend playing it in block mode and large size for the most fun. :) Enjoy!
+- <b>Blocks Mode</b> - pieces constructed from 1 - 6 bricks. 28 different pieces, including a randomly generated piece that can take on bizzare shapes. In this mode it is possible to clear 6 lines at once, earning yourself a "Block." I recommend playing it in block mode and large size for the most fun. :) Enjoy!
 High Scores are saved for each of the modes.<br/>
 
 Compiled with PureBasic 3.94
@@ -16,10 +16,18 @@ Compiled with PureBasic 3.94
 <table>
 <tr>
     <td>
-        <img src="/screenshots/screenshot.JPG" width="400px"/>
+        <img src="/screenshots/screenshot_new.png" width="45%"/>
     </td>
     <td>
-        <img src="/screenshots/screenshot4.JPG" width="400px"/>
+        <img src="/screenshots/screenshot_new2.png" width="45%"/>
+    </td>
+</tr>
+<tr>
+    <td>
+        <img src="/screenshots/screenshot.JPG" width="45%"/>
+    </td>
+    <td>
+        <img src="/screenshots/screenshot4.JPG" width="45%"/>
     </td>
 </tr>
 </table>
