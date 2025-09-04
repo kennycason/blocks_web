@@ -77,6 +77,17 @@ class BlocksGame {
         this.specialMessage = '';
         this.specialMessageTime = 0;
         
+        // Environment evolution system
+        this.evolutionProgress = 0; // 0-100% through complete evolution cycle
+        this.maxEvolutionSteps = 50; // Total pieces needed for full cycle
+        this.evolutionPhases = [
+            { name: 'sunny-day', start: 0, end: 25 },
+            { name: 'sunset', start: 20, end: 45 },
+            { name: 'night', start: 40, end: 65 },
+            { name: 'space', start: 60, end: 85 },
+            { name: 'dawn', start: 80, end: 100 }
+        ];
+        
         // Sprite sheet for piece textures
         this.spriteSheet = null;
         this.spriteSize = 24; // Each sprite is 24x24 pixels
@@ -294,6 +305,7 @@ class BlocksGame {
         
         this.score += 30 + (10 * this.level);
         this.checkLines();
+        this.evolveEnvironment(); // Evolve environment with each piece
         this.spawnNewPiece();
     }
     
@@ -702,6 +714,11 @@ class BlocksGame {
         this.dropSpeed = 350;
         this.pieceStats = {};
         this.totalPieces = 0;
+        
+        // Reset environment evolution
+        this.evolutionProgress = 0;
+        this.updateEnvironmentMorphing(); // Start with sunny day
+        
         document.getElementById('gameOverOverlay').style.display = 'none';
         document.getElementById('pauseOverlay').style.display = 'none';
         this.initGame();
@@ -745,24 +762,216 @@ class BlocksGame {
         this.newGame();
     }
     
-    changeStyle(style) {
-        const body = document.body;
-        const bgElements = document.getElementById('bgElements');
+    evolveEnvironment() {
+        // Advance evolution by 2% each piece (50 pieces = full cycle)
+        this.evolutionProgress += 2;
         
-        // Remove all style classes
-        body.classList.remove('style-simple', 'style-sunny-day');
-        
-        // Add the new style class
-        body.classList.add(`style-${style}`);
-        
-        // Show/hide background elements based on style
-        if (style === 'sunny-day') {
-            bgElements.style.display = 'block';
-        } else {
-            bgElements.style.display = 'none';
+        // Cycle back to beginning after 100%
+        if (this.evolutionProgress > 100) {
+            this.evolutionProgress = 0;
         }
         
-        console.log(`🎨 Style changed to: ${style.toUpperCase()}`);
+        this.updateEnvironmentMorphing();
+    }
+    
+    updateEnvironmentMorphing() {
+        const progress = this.evolutionProgress;
+        
+        // Update each element based on current progress
+        this.morphSun(progress);
+        this.morphSky(progress);
+        this.morphClouds(progress);
+        this.morphSurface(progress);
+        this.morphAtmosphere(progress);
+        
+        console.log(`🌍 Environment evolution: ${progress.toFixed(1)}%`);
+    }
+    
+    morphSun(progress) {
+        const sun = document.querySelector('.sun');
+        if (!sun) return;
+        
+        // Sun transforms: Sun -> Moon -> Planet -> Star -> Sun
+        let hue = 45; // Golden yellow
+        let size = 80;
+        let brightness = 1;
+        let position = { top: 5, right: 8 };
+        
+        if (progress < 25) {
+            // Sunny day: Bright yellow/gold sun
+            hue = 45;
+            brightness = 1;
+        } else if (progress < 50) {
+            // Sunset: Orange to red
+            const t = (progress - 25) / 25;
+            hue = 45 - (t * 30); // 45 to 15 (orange to red)
+            position.top = 5 + (t * 20); // Lower in sky
+        } else if (progress < 75) {
+            // Night: Moon (gray/silver)
+            const t = (progress - 50) / 25;
+            hue = 0;
+            brightness = 0.3 + (t * 0.4); // Dimmer, silvery
+            size = 60 + (t * 20); // Smaller to larger
+            position.top = 15 + (t * 10);
+        } else {
+            // Space: Bright star
+            const t = (progress - 75) / 25;
+            hue = 200 + (t * 200); // Blue to white
+            brightness = 1.5;
+            size = 40 + (t * 40); // Small bright star
+            position.top = 5;
+            position.right = 8 + (t * 15);
+        }
+        
+        sun.style.filter = `hue-rotate(${hue}deg) brightness(${brightness})`;
+        sun.style.width = `${size}px`;
+        sun.style.height = `${size}px`;
+        sun.style.top = `${position.top}%`;
+        sun.style.right = `${position.right}%`;
+    }
+    
+    morphSky(progress) {
+        const body = document.body;
+        
+        // Sky color progression through day/night cycle
+        let gradient;
+        
+        if (progress < 25) {
+            // Day: Blue sky
+            gradient = `linear-gradient(to bottom, 
+                #87CEEB 0%, #98D8E8 30%, #B6E5F0 60%, #32CD32 85%, #228B22 100%)`;
+        } else if (progress < 50) {
+            // Sunset: Orange/pink sky
+            const t = (progress - 25) / 25;
+            gradient = `linear-gradient(to bottom, 
+                ${this.lerpColor('#87CEEB', '#FF6B35', t)} 0%, 
+                ${this.lerpColor('#98D8E8', '#FF8E53', t)} 30%, 
+                ${this.lerpColor('#B6E5F0', '#FFB07A', t)} 60%, 
+                #32CD32 85%, #228B22 100%)`;
+        } else if (progress < 75) {
+            // Night: Dark sky
+            const t = (progress - 50) / 25;
+            gradient = `linear-gradient(to bottom, 
+                ${this.lerpColor('#FF6B35', '#191970', t)} 0%, 
+                ${this.lerpColor('#FF8E53', '#1E1E3F', t)} 30%, 
+                ${this.lerpColor('#FFB07A', '#0F0F2A', t)} 60%, 
+                #1A4E1A 85%, #0F2F0F 100%)`;
+        } else {
+            // Space: Deep space
+            const t = (progress - 75) / 25;
+            gradient = `radial-gradient(ellipse at center, 
+                ${this.lerpColor('#191970', '#1a0033', t)} 0%, 
+                ${this.lerpColor('#1E1E3F', '#0d0019', t)} 30%, 
+                ${this.lerpColor('#0F0F2A', '#000000', t)} 60%, 
+                #000000 100%)`;
+        }
+        
+        body.style.background = gradient;
+    }
+    
+    morphClouds(progress) {
+        const clouds = document.querySelectorAll('.cloud');
+        
+        clouds.forEach((cloud, index) => {
+            if (progress < 50) {
+                // Day/sunset: Visible clouds
+                cloud.style.opacity = '0.8';
+                cloud.style.display = 'block';
+                
+                if (progress > 25) {
+                    // Sunset: Orange tint
+                    const t = (progress - 25) / 25;
+                    cloud.style.filter = `hue-rotate(${t * 30}deg) brightness(${1 + t * 0.5})`;
+                }
+            } else if (progress < 75) {
+                // Night: Fade out clouds
+                const t = (progress - 50) / 25;
+                cloud.style.opacity = `${0.8 - t * 0.8}`;
+            } else {
+                // Space: Hide clouds
+                cloud.style.display = 'none';
+            }
+        });
+    }
+    
+    morphSurface(progress) {
+        const hills = document.querySelector('.hills');
+        const grass = document.querySelector('.grass');
+        
+        if (progress < 75) {
+            // Land visible
+            if (hills) hills.style.display = 'block';
+            if (grass) grass.style.display = 'block';
+            
+            if (progress > 50) {
+                // Night: Darken surface
+                const t = (progress - 50) / 25;
+                if (hills) hills.style.filter = `brightness(${1 - t * 0.6})`;
+                if (grass) grass.style.filter = `brightness(${1 - t * 0.6})`;
+            }
+        } else {
+            // Space: Hide surface
+            if (hills) hills.style.display = 'none';
+            if (grass) grass.style.display = 'none';
+        }
+    }
+    
+    morphAtmosphere(progress) {
+        const stars = document.querySelector('.stars');
+        const nebula = document.querySelector('.nebula');
+        const galaxy = document.querySelector('.galaxy-center');
+        
+        if (progress < 50) {
+            // Day/sunset: Hide space elements
+            if (stars) stars.style.display = 'none';
+            if (nebula) nebula.style.display = 'none';
+            if (galaxy) galaxy.style.display = 'none';
+        } else if (progress < 75) {
+            // Night: Show stars
+            if (stars) {
+                stars.style.display = 'block';
+                const t = (progress - 50) / 25;
+                stars.style.opacity = `${t * 0.8}`;
+            }
+            if (nebula) nebula.style.display = 'none';
+            if (galaxy) galaxy.style.display = 'none';
+        } else {
+            // Space: Show all space elements
+            if (stars) {
+                stars.style.display = 'block';
+                stars.style.opacity = '1';
+            }
+            if (nebula) {
+                nebula.style.display = 'block';
+                const t = (progress - 75) / 25;
+                nebula.style.opacity = `${t * 0.5}`;
+            }
+            if (galaxy) {
+                galaxy.style.display = 'block';
+                const t = (progress - 75) / 25;
+                galaxy.style.opacity = `${t * 0.8}`;
+            }
+        }
+    }
+    
+    lerpColor(color1, color2, t) {
+        // Linear interpolation between two hex colors
+        const hex1 = color1.replace('#', '');
+        const hex2 = color2.replace('#', '');
+        
+        const r1 = parseInt(hex1.substr(0, 2), 16);
+        const g1 = parseInt(hex1.substr(2, 2), 16);
+        const b1 = parseInt(hex1.substr(4, 2), 16);
+        
+        const r2 = parseInt(hex2.substr(0, 2), 16);
+        const g2 = parseInt(hex2.substr(2, 2), 16);
+        const b2 = parseInt(hex2.substr(4, 2), 16);
+        
+        const r = Math.round(r1 + (r2 - r1) * t);
+        const g = Math.round(g1 + (g2 - g1) * t);
+        const b = Math.round(b1 + (b2 - b1) * t);
+        
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     }
     
     setupEventListeners() {
@@ -875,10 +1084,6 @@ class BlocksGame {
         
         document.getElementById('boardSize').addEventListener('change', (e) => {
             this.changeBoardSize(e.target.value);
-        });
-        
-        document.getElementById('gameStyle').addEventListener('change', (e) => {
-            this.changeStyle(e.target.value);
         });
         
         document.getElementById('newGame').addEventListener('click', () => {

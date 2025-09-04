@@ -34,6 +34,16 @@
             );
         }
         
+        /* Space Style */
+        body.style-space {
+            background: radial-gradient(ellipse at center, 
+                #1a0033 0%,    /* Deep purple center */
+                #0d0019 30%,   /* Darker purple */
+                #000000 60%,   /* Black space */
+                #000000 100%   /* Pure black */
+            );
+        }
+        
         /* Animated Background Elements */
         .bg-elements {
             position: fixed;
@@ -68,6 +78,23 @@
             background: rgba(0, 0, 0, 0.6);
         }
         
+        /* More transparent UI in Space mode */
+        body.style-space .info-panel {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        body.style-space .histogram {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        body.style-space .menu-bar {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        body.style-space .footer {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
         /* Animated Sun */
         .sun {
             position: absolute;
@@ -78,7 +105,7 @@
             background: radial-gradient(circle, #FFD700 30%, #FFA500 70%);
             border-radius: 50%;
             box-shadow: 0 0 30px #FFD700, 0 0 60px #FFA500;
-            animation: sunGlow 4s ease-in-out infinite alternate;
+            animation: sunGlow 4s ease-in-out infinite alternate, sunBreathe 8s ease-in-out infinite;
         }
         
         .sun::before {
@@ -217,6 +244,51 @@
             animation: grassWave 3s ease-in-out infinite;
         }
         
+        /* Space Elements */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(2px 2px at 20px 30px, white, transparent),
+                radial-gradient(1px 1px at 40px 70px, white, transparent),
+                radial-gradient(1px 1px at 90px 40px, white, transparent),
+                radial-gradient(2px 2px at 130px 80px, white, transparent),
+                radial-gradient(1px 1px at 160px 30px, white, transparent),
+                radial-gradient(2px 2px at 200px 60px, white, transparent),
+                radial-gradient(1px 1px at 240px 90px, white, transparent),
+                radial-gradient(1px 1px at 280px 40px, white, transparent),
+                radial-gradient(2px 2px at 320px 20px, white, transparent),
+                radial-gradient(1px 1px at 360px 80px, white, transparent);
+            background-repeat: repeat;
+            background-size: 400px 100px;
+            animation: starTwinkle 6s ease-in-out infinite;
+        }
+        
+        .nebula {
+            position: absolute;
+            top: 10%;
+            left: 20%;
+            width: 300px;
+            height: 200px;
+            background: radial-gradient(ellipse, rgba(138, 43, 226, 0.3) 0%, rgba(75, 0, 130, 0.2) 50%, transparent 100%);
+            border-radius: 50%;
+            animation: nebulaPulse 12s ease-in-out infinite;
+        }
+        
+        .galaxy-center {
+            position: absolute;
+            top: 30%;
+            right: 15%;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(138, 43, 226, 0.3) 40%, rgba(75, 0, 130, 0.2) 70%, transparent 100%);
+            border-radius: 50%;
+            animation: galaxyRotate 20s linear infinite, galaxyBreathe 8s ease-in-out infinite;
+        }
+        
         /* Keyframe animations */
         @keyframes sunGlow {
             0% { box-shadow: 0 0 30px #FFD700, 0 0 60px #FFA500; }
@@ -237,6 +309,37 @@
             0%, 100% { transform: scaleY(1); }
             50% { transform: scaleY(1.1); }
         }
+        
+        @keyframes sunBreathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes nebulaPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.3; 
+            }
+            50% { 
+                transform: scale(1.2); 
+                opacity: 0.5; 
+            }
+        }
+        
+        @keyframes galaxyRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes galaxyBreathe {
+            0%, 100% { transform: scale(1) rotate(var(--rotation, 0deg)); }
+            50% { transform: scale(1.15) rotate(var(--rotation, 0deg)); }
+        }
 
         .main-content {
             display: flex;
@@ -248,7 +351,7 @@
         }
 
         .game-board {
-            border: 3px solid #fff;
+            border: 3px solid rgba(255, 255, 255, 0.4);
             background: #000;
             position: relative;
         }
@@ -297,7 +400,7 @@
 
         .info-panel {
             background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             padding: 15px;
             width: 150px;
         }
@@ -400,7 +503,7 @@
 
         .histogram {
             background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             padding: 15px;
             height: auto;
             min-height: 100px;
@@ -730,15 +833,21 @@
         }
     </style>
 </head>
-<body class="style-simple">
+<body class="style-sunny-day">
     <!-- Animated Background Elements -->
     <div class="bg-elements" id="bgElements">
+        <!-- Sunny Day Elements -->
         <div class="sun"></div>
         <div class="cloud cloud1"></div>
         <div class="cloud cloud2"></div>
         <div class="cloud cloud3"></div>
         <div class="hills"></div>
         <div class="grass"></div>
+        
+        <!-- Space Elements -->
+        <div class="stars"></div>
+        <div class="nebula"></div>
+        <div class="galaxy-center"></div>
     </div>
 
     <div class="menu-bar">
@@ -757,14 +866,6 @@
                 <option value="small">Small (10x10)</option>
                 <option value="medium">Medium (10x20)</option>
                 <option value="big" selected>Big (15x25)</option>
-            </select>
-        </div>
-        
-        <div class="menu-group">
-            <label>Style:</label>
-            <select id="gameStyle">
-                <option value="simple" selected>SIMPLE</option>
-                <option value="sunny-day">SUNNY DAY</option>
             </select>
         </div>
         
