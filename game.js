@@ -77,7 +77,13 @@ class BlocksGame {
         this.specialMessage = '';
         this.specialMessageTime = 0;
         
-        // Block colors (consistent colors for each piece type 1-29)
+        // Sprite sheet for piece textures
+        this.spriteSheet = null;
+        this.spriteSize = 24; // Each sprite is 24x24 pixels
+        this.spriteGridSize = 6; // 6x6 grid
+        this.spritesLoaded = false;
+        
+        // Block colors (consistent colors for each piece type 1-29) - fallback if sprites fail
         this.blockColors = [
             '#000000', // 0 - empty
             '#FF0000', // 1 - Red
@@ -111,10 +117,24 @@ class BlocksGame {
             '#DDA0DD'  // 29 - Plum
         ];
         
+        this.loadSpriteSheet();
         this.initGame();
         this.updateHighScoresDisplay();
         this.setupEventListeners();
         this.gameLoop();
+    }
+    
+    loadSpriteSheet() {
+        this.spriteSheet = new Image();
+        this.spriteSheet.onload = () => {
+            this.spritesLoaded = true;
+            console.log('🖼️ Sprite sheet loaded successfully!');
+        };
+        this.spriteSheet.onerror = () => {
+            console.warn('⚠️ Failed to load sprite sheet, falling back to solid colors');
+            this.spritesLoaded = false;
+        };
+        this.spriteSheet.src = 'piece_sprites.png';
     }
     
     initGame() {
@@ -523,13 +543,19 @@ class BlocksGame {
                     const x = centerX + (block[0] * blockSize) - blockSize/2;
                     const y = centerY + (block[1] * blockSize) - blockSize/2;
                     
-                    ctx.fillStyle = this.blockColors[piece.image] || '#666';
-                    ctx.fillRect(x, y, blockSize, blockSize);
-                    
-                    // Add border for better visibility
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 0.5;
-                    ctx.strokeRect(x, y, blockSize, blockSize);
+                    if (this.spritesLoaded && this.spriteSheet) {
+                        // Draw from sprite sheet
+                        this.drawSprite(ctx, x, y, piece.image, blockSize);
+                    } else {
+                        // Fallback to solid colors
+                        ctx.fillStyle = this.blockColors[piece.image] || '#666';
+                        ctx.fillRect(x, y, blockSize, blockSize);
+                        
+                        // Add border for better visibility
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 0.5;
+                        ctx.strokeRect(x, y, blockSize, blockSize);
+                    }
                 }
             }
             
@@ -585,13 +611,35 @@ class BlocksGame {
         const pixelX = x * this.blockSize;
         const pixelY = y * this.blockSize;
         
-        this.ctx.fillStyle = this.blockColors[colorIndex] || '#666';
-        this.ctx.fillRect(pixelX, pixelY, this.blockSize, this.blockSize);
+        if (this.spritesLoaded && this.spriteSheet && colorIndex > 0) {
+            // Draw from sprite sheet
+            this.drawSprite(this.ctx, pixelX, pixelY, colorIndex, this.blockSize);
+        } else {
+            // Fallback to solid colors
+            this.ctx.fillStyle = this.blockColors[colorIndex] || '#666';
+            this.ctx.fillRect(pixelX, pixelY, this.blockSize, this.blockSize);
+            
+            // Add border for better visibility
+            this.ctx.strokeStyle = '#fff';
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeRect(pixelX, pixelY, this.blockSize, this.blockSize);
+        }
+    }
+    
+    drawSprite(ctx, destX, destY, spriteIndex, destSize) {
+        if (!this.spriteSheet || spriteIndex <= 0) return;
         
-        // Add border for better visibility
-        this.ctx.strokeStyle = '#fff';
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(pixelX, pixelY, this.blockSize, this.blockSize);
+        // Calculate source position in sprite sheet (1-based to 0-based)
+        const gridIndex = spriteIndex - 1;
+        const srcX = (gridIndex % this.spriteGridSize) * this.spriteSize;
+        const srcY = Math.floor(gridIndex / this.spriteGridSize) * this.spriteSize;
+        
+        // Draw the sprite scaled to the destination size
+        ctx.drawImage(
+            this.spriteSheet,
+            srcX, srcY, this.spriteSize, this.spriteSize,  // Source rectangle
+            destX, destY, destSize, destSize              // Destination rectangle
+        );
     }
     
     drawNextPiece() {
@@ -607,12 +655,18 @@ class BlocksGame {
                 const x = centerX + (block[0] * blockSize) - blockSize/2;
                 const y = centerY + (block[1] * blockSize) - blockSize/2;
                 
-                this.nextCtx.fillStyle = this.blockColors[this.nextPiece.image] || '#666';
-                this.nextCtx.fillRect(x, y, blockSize, blockSize);
-                
-                this.nextCtx.strokeStyle = '#fff';
-                this.nextCtx.lineWidth = 1;
-                this.nextCtx.strokeRect(x, y, blockSize, blockSize);
+                if (this.spritesLoaded && this.spriteSheet) {
+                    // Draw from sprite sheet
+                    this.drawSprite(this.nextCtx, x, y, this.nextPiece.image, blockSize);
+                } else {
+                    // Fallback to solid colors
+                    this.nextCtx.fillStyle = this.blockColors[this.nextPiece.image] || '#666';
+                    this.nextCtx.fillRect(x, y, blockSize, blockSize);
+                    
+                    this.nextCtx.strokeStyle = '#fff';
+                    this.nextCtx.lineWidth = 1;
+                    this.nextCtx.strokeRect(x, y, blockSize, blockSize);
+                }
             }
         }
     }
@@ -1070,6 +1124,7 @@ window.addEventListener('load', () => {
     window.configSlide = (options) => window.game.configureSlide(options);
     
     console.log('🎮 HEXTRIS game loaded!');
+    console.log('🖼️ Using sprite sheet for piece textures');
     console.log('💡 Try these in console:');
     console.log('   slidePreset("minimal")    - Basic sliding');
     console.log('   slidePreset("standard")   - Default sliding (current)');
