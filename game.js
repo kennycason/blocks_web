@@ -745,6 +745,26 @@ class BlocksGame {
         this.newGame();
     }
     
+    changeStyle(style) {
+        const body = document.body;
+        const bgElements = document.getElementById('bgElements');
+        
+        // Remove all style classes
+        body.classList.remove('style-simple', 'style-sunny-day');
+        
+        // Add the new style class
+        body.classList.add(`style-${style}`);
+        
+        // Show/hide background elements based on style
+        if (style === 'sunny-day') {
+            bgElements.style.display = 'block';
+        } else {
+            bgElements.style.display = 'none';
+        }
+        
+        console.log(`🎨 Style changed to: ${style.toUpperCase()}`);
+    }
+    
     setupEventListeners() {
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
@@ -855,6 +875,10 @@ class BlocksGame {
         
         document.getElementById('boardSize').addEventListener('change', (e) => {
             this.changeBoardSize(e.target.value);
+        });
+        
+        document.getElementById('gameStyle').addEventListener('change', (e) => {
+            this.changeStyle(e.target.value);
         });
         
         document.getElementById('newGame').addEventListener('click', () => {

@@ -13,9 +13,229 @@
 
         body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: #fff;
             overflow: hidden;
+            position: relative;
+        }
+        
+        /* Default Simple Style */
+        body.style-simple {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+        
+        /* Sunny Day Style */
+        body.style-sunny-day {
+            background: linear-gradient(to bottom, 
+                #87CEEB 0%,    /* Sky blue */
+                #98D8E8 30%,   /* Lighter sky */
+                #B6E5F0 60%,   /* Even lighter */
+                #32CD32 85%,   /* Grass green */
+                #228B22 100%   /* Darker grass */
+            );
+        }
+        
+        /* Animated Background Elements */
+        .bg-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            display: none; /* Hidden by default */
+        }
+        
+        /* Show bg elements only for sunny-day style */
+        body.style-sunny-day .bg-elements {
+            display: block;
+        }
+        
+        /* More transparent UI in Sunny Day mode */
+        body.style-sunny-day .info-panel {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        body.style-sunny-day .histogram {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        body.style-sunny-day .menu-bar {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        body.style-sunny-day .footer {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Animated Sun */
+        .sun {
+            position: absolute;
+            top: 5%;
+            right: 8%;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #FFD700 30%, #FFA500 70%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px #FFD700, 0 0 60px #FFA500;
+            animation: sunGlow 4s ease-in-out infinite alternate;
+        }
+        
+        .sun::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 120px;
+            height: 120px;
+            background: 
+                linear-gradient(45deg, transparent 45%, #FFD700 50%, transparent 55%),
+                linear-gradient(-45deg, transparent 45%, #FFD700 50%, transparent 55%),
+                linear-gradient(135deg, transparent 45%, #FFD700 50%, transparent 55%),
+                linear-gradient(-135deg, transparent 45%, #FFD700 50%, transparent 55%);
+            border-radius: 50%;
+            animation: sunRays 8s linear infinite;
+        }
+        
+        /* Cloud animations */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: cloudFloat 20s linear infinite;
+        }
+        
+        .cloud::before {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+        }
+        
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+        }
+        
+        .cloud1 {
+            width: 100px;
+            height: 40px;
+            top: 15%;
+            left: -150px;
+            animation-duration: 25s;
+        }
+        
+        .cloud1::before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+        
+        .cloud1::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+        
+        .cloud2 {
+            width: 80px;
+            height: 30px;
+            top: 25%;
+            left: -120px;
+            animation-duration: 30s;
+            animation-delay: -10s;
+        }
+        
+        .cloud2::before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 15px;
+        }
+        
+        .cloud2::after {
+            width: 50px;
+            height: 30px;
+            top: -10px;
+            right: 15px;
+        }
+        
+        .cloud3 {
+            width: 120px;
+            height: 50px;
+            top: 8%;
+            left: -180px;
+            animation-duration: 35s;
+            animation-delay: -20s;
+        }
+        
+        .cloud3::before {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 20px;
+        }
+        
+        .cloud3::after {
+            width: 70px;
+            height: 50px;
+            top: -20px;
+            right: 20px;
+        }
+        
+        /* Hills */
+        .hills {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: 
+                radial-gradient(ellipse at 20% 100%, #228B22 0%, #228B22 50%, transparent 50%),
+                radial-gradient(ellipse at 60% 100%, #32CD32 0%, #32CD32 60%, transparent 60%),
+                radial-gradient(ellipse at 90% 100%, #228B22 0%, #228B22 40%, transparent 40%);
+        }
+        
+        /* Grass animation */
+        .grass {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: repeating-linear-gradient(
+                90deg,
+                #32CD32 0px,
+                #228B22 2px,
+                #32CD32 4px
+            );
+            animation: grassWave 3s ease-in-out infinite;
+        }
+        
+        /* Keyframe animations */
+        @keyframes sunGlow {
+            0% { box-shadow: 0 0 30px #FFD700, 0 0 60px #FFA500; }
+            100% { box-shadow: 0 0 40px #FFD700, 0 0 80px #FFA500; }
+        }
+        
+        @keyframes sunRays {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes cloudFloat {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+        
+        @keyframes grassWave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.1); }
         }
 
         .main-content {
@@ -510,7 +730,17 @@
         }
     </style>
 </head>
-<body>
+<body class="style-simple">
+    <!-- Animated Background Elements -->
+    <div class="bg-elements" id="bgElements">
+        <div class="sun"></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+        <div class="hills"></div>
+        <div class="grass"></div>
+    </div>
+
     <div class="menu-bar">
         <div class="menu-group">
             <label>Mode:</label>
@@ -527,6 +757,14 @@
                 <option value="small">Small (10x10)</option>
                 <option value="medium">Medium (10x20)</option>
                 <option value="big" selected>Big (15x25)</option>
+            </select>
+        </div>
+        
+        <div class="menu-group">
+            <label>Style:</label>
+            <select id="gameStyle">
+                <option value="simple" selected>SIMPLE</option>
+                <option value="sunny-day">SUNNY DAY</option>
             </select>
         </div>
         
