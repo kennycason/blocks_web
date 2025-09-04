@@ -163,6 +163,20 @@
             min-width: 60px;
             font-style: italic;
         }
+        
+        .reset-hiscore-link {
+            color: #ccc;
+            font-size: 11px;
+            text-decoration: none;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-block;
+        }
+        
+        .reset-hiscore-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
 
         .histogram {
             background: rgba(0, 0, 0, 0.8);
@@ -518,8 +532,6 @@
         
         <div class="menu-group">
             <button id="newGame">New Game</button>
-            <button id="pauseGame">Pause</button>
-            <button id="resetHiScore">Reset Hi-Score</button>
         </div>
     </div>
 
@@ -582,6 +594,7 @@
                 <div><strong>W</strong> - Pause | <strong>A/D</strong> - Move | <strong>S</strong> - Fast drop</div>
                 <div><strong>J/K/L</strong> - Rotate (CCW/180°/CW) | <strong>R</strong> - Reset | <strong>ESC</strong> - Menu</div>
             </div>
+            <a href="#" id="resetHiScore" class="reset-hiscore-link">reset hi-score</a>
         </div>
     </div>
 

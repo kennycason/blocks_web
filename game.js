@@ -861,11 +861,8 @@ class BlocksGame {
             this.newGame();
         });
         
-        document.getElementById('pauseGame').addEventListener('click', () => {
-            this.togglePause();
-        });
-        
-        document.getElementById('resetHiScore').addEventListener('click', () => {
+        document.getElementById('resetHiScore').addEventListener('click', (e) => {
+            e.preventDefault();
             this.resetHighScores();
         });
     }

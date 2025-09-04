@@ -20,7 +20,7 @@ Compiled with PureBasic 3.94
 <table>
 <tr>
     <td width="50%">
-        <img src="/screenshots/screenshot_new.png"/>
+        <img src="/screenshots/screenshot_new3.png"/>
     </td>
     <td width="50%">
         <img src="/screenshots/screenshot_new2.png"/>
