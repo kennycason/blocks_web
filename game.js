@@ -526,18 +526,18 @@ class BlocksGame {
             // Create mini canvas for piece preview
             const canvas = document.createElement('canvas');
             canvas.className = 'piece-preview';
-            canvas.width = 50;
-            canvas.height = 30;
+            canvas.width = 62;
+            canvas.height = 34;
             const ctx = canvas.getContext('2d');
             
             // Draw piece preview
             ctx.fillStyle = '#333';
-            ctx.fillRect(0, 0, 50, 30);
+            ctx.fillRect(0, 0, 62, 34);
             
             if (piece && piece.blocks) {
-                const blockSize = 8;
-                const centerX = 25;
-                const centerY = 15;
+                const blockSize = 9; // Slightly larger blocks for bigger preview
+                const centerX = 31; // Adjusted for wider canvas (62/2 = 31)
+                const centerY = 17; // Adjusted for taller canvas (34/2 = 17)
                 
                 for (let block of piece.blocks) {
                     const x = centerX + (block[0] * blockSize) - blockSize/2;
