@@ -1,6 +1,10 @@
 Blocks
 ======
 
+This is a port of my old Blocks game to Web via AI/Cursor.
+
+----
+
 This was one of the first games I ever wrote to completion. So I'm uploading the source just for the sake of nostalgia. :)
 
 Blocks is a tetris like game written in Purebasic.
@@ -15,18 +19,18 @@ Compiled with PureBasic 3.94
 
 <table>
 <tr>
-    <td>
+    <td width="50%">
         <img src="/screenshots/screenshot_new.png"/>
     </td>
-    <td>
+    <td width="50%">
         <img src="/screenshots/screenshot_new2.png"/>
     </td>
 </tr>
 <tr>
-    <td>
+    <td width="50%">
         <img src="/screenshots/screenshot.JPG"/>
     </td>
-    <td>
+    <td width="50%">
         <img src="/screenshots/screenshot4.JPG"/>
     </td>
 </tr>
