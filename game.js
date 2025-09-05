@@ -185,25 +185,66 @@ class BlocksGame {
         // Detect controller type based on gamepad ID string
         const id = gamepadId.toLowerCase();
         
-        if (id.includes('nintendo') || id.includes('switch') || 
-            (id.includes('vendor: 057e') && id.includes('product: 2006'))) {
+        // SNES/Switch USB Controller (preserve existing working detection)
+        if (id.includes('nintendo') || id.includes('switch')) {
             return {
                 type: 'snes-switch',
                 name: 'SNES/Switch Controller',
                 config: this.getSNESSwitchConfig()
             };
-        } else if (id.includes('8bitdo') || id.includes('sn30') || 
-                  (id.includes('vendor: 2dc8') && id.includes('product: 6001'))) {
+        }
+        
+        // Nintendo Switch Pro Controller (different from SNES mapping)
+        else if (id.includes('pro controller') || id.includes('switch pro') ||
+                (id.includes('vendor: 057e') && id.includes('product: 2009'))) {
+            return {
+                type: 'switch-pro',
+                name: 'Nintendo Switch Pro Controller',
+                config: this.getSwitchProConfig()
+            };
+        }
+        
+        // PlayStation 4 Controller (DualShock 4)
+        else if (id.includes('ps4') || id.includes('playstation 4')) {
+            return {
+                type: 'ps4',
+                name: 'PlayStation 4 Controller',
+                config: this.getPS4Config()
+            };
+        }
+        
+        // PlayStation 5 Controller (DualSense)
+        else if (id.includes('dualsense') || id.includes('ps5') || id.includes('playstation 5')) {
+            return {
+                type: 'ps5',
+                name: 'PlayStation 5 DualSense Controller',
+                config: this.getPS5Config()
+            };
+        }
+        
+        // Xbox Controllers (One, Series X/S, 360)
+        else if (id.includes('xbox') || id.includes('microsoft')) {
+            return {
+                type: 'xbox',
+                name: 'Xbox Controller',
+                config: this.getXboxConfig()
+            };
+        }
+        
+        // 8BitDo SN30 Pro
+        else if (id.includes('8bitdo') || id.includes('sn30')) {
             return {
                 type: '8bitdo-sn30-pro',
                 name: '8BitDo SN30 Pro',
                 config: this.get8BitDoSN30ProConfig()
             };
-        } else {
-            // Default fallback - use 8BitDo mapping for unknown controllers
+        }
+        
+        // Default fallback - use 8BitDo mapping for unknown controllers
+        else {
             return {
                 type: 'fallback',
-                name: 'Generic Controller (8BitDo mapping)',
+                name: 'Generic USB Controller (Standard mapping)',
                 config: this.get8BitDoSN30ProConfig()
             };
         }
@@ -274,6 +315,150 @@ class BlocksGame {
                     up: { min: -0.5 }     // Up on vertical axis (negative)
                 },
                 // Standard D-pad buttons
+                buttons: {
+                    up: 12,
+                    down: 13,
+                    left: 14,
+                    right: 15
+                }
+            }
+        };
+    }
+    
+    // Nintendo Switch Pro Controller configuration
+    getSwitchProConfig() {
+        return {
+            buttons: {
+                rotateCW: [1, 5],      // A or R shoulder
+                rotateCCW: [0, 4],     // B or L shoulder  
+                rotate180: [2, 3],     // Y or X
+                pause: [9],            // Plus/Start
+                select: [8]            // Minus/Select
+            },
+            dpad: {
+                useAxes: true,
+                axes: {
+                    horizontal: 0,     // Left stick horizontal
+                    vertical: 1        // Left stick vertical
+                },
+                axisMapping: {
+                    left: { min: -1.0, max: -0.5 },
+                    right: { min: 0.5, max: 1.0 },
+                    down: { min: 0.5, max: 1.0 }
+                },
+                verticalAxis: {
+                    down: { min: 0.5 },
+                    up: { min: -0.5 }
+                },
+                // D-pad buttons (hat switch)
+                buttons: {
+                    up: 12,
+                    down: 13,
+                    left: 14,
+                    right: 15
+                }
+            }
+        };
+    }
+    
+    // PlayStation 4 (DualShock 4) controller configuration
+    getPS4Config() {
+        return {
+            buttons: {
+                rotateCW: [1, 5],      // Circle or R1
+                rotateCCW: [0, 4],     // Cross or L1
+                rotate180: [2, 3],     // Square or Triangle
+                pause: [9],            // Options
+                select: [8]            // Share
+            },
+            dpad: {
+                useAxes: true,
+                axes: {
+                    horizontal: 0,     // Left stick horizontal
+                    vertical: 1        // Left stick vertical
+                },
+                axisMapping: {
+                    left: { min: -1.0, max: -0.5 },
+                    right: { min: 0.5, max: 1.0 },
+                    down: { min: 0.5, max: 1.0 }
+                },
+                verticalAxis: {
+                    down: { min: 0.5 },
+                    up: { min: -0.5 }
+                },
+                // D-pad buttons
+                buttons: {
+                    up: 12,
+                    down: 13,
+                    left: 14,
+                    right: 15
+                }
+            }
+        };
+    }
+    
+    // PlayStation 5 (DualSense) controller configuration
+    getPS5Config() {
+        return {
+            buttons: {
+                rotateCW: [1, 5],      // Circle or R1
+                rotateCCW: [0, 4],     // Cross or L1
+                rotate180: [2, 3],     // Square or Triangle
+                pause: [9],            // Options
+                select: [8]            // Create (was Share)
+            },
+            dpad: {
+                useAxes: true,
+                axes: {
+                    horizontal: 0,     // Left stick horizontal
+                    vertical: 1        // Left stick vertical
+                },
+                axisMapping: {
+                    left: { min: -1.0, max: -0.5 },
+                    right: { min: 0.5, max: 1.0 },
+                    down: { min: 0.5, max: 1.0 }
+                },
+                verticalAxis: {
+                    down: { min: 0.5 },
+                    up: { min: -0.5 }
+                },
+                // D-pad buttons
+                buttons: {
+                    up: 12,
+                    down: 13,
+                    left: 14,
+                    right: 15
+                }
+            }
+        };
+    }
+    
+    // Xbox Controller configuration (Xbox One, Series X/S, 360)
+    getXboxConfig() {
+        return {
+            buttons: {
+                rotateCW: [1, 5],      // B or RB
+                rotateCCW: [0, 4],     // A or LB
+                rotate180: [2, 3],     // X or Y
+                pause: [9],            // Menu/Start
+                select: [8]            // View/Back
+            },
+            dpad: {
+                useAxes: true,
+                axes: {
+                    horizontal: 0,     // Left stick horizontal
+                    vertical: 1        // Left stick vertical
+                },
+                axisMapping: {
+                    left: { min: -1.0, max: -0.5 },
+                    right: { min: 0.5, max: 1.0 },
+                    down: { min: 0.5, max: 1.0 }
+                },
+                verticalAxis: {
+                    down: { min: 0.5 },
+                    up: { min: -0.5 }
+                },
+                // D-pad buttons
                 buttons: {
                     up: 12,
                     down: 13,
@@ -1626,9 +1811,18 @@ class BlocksGame {
         
         // Use controller-specific update function based on detected type
         if (this.gamepadType === 'snes-switch') {
+            // SNES/Switch USB controller (preserve existing working logic)
             this.updateSNESSwitchGamepad(gamepad);
+        } else if (this.gamepadType === 'switch-pro' || 
+                   this.gamepadType === 'ps4' || 
+                   this.gamepadType === 'ps5' || 
+                   this.gamepadType === 'xbox' ||
+                   this.gamepadType === '8bitdo-sn30-pro' ||
+                   this.gamepadType === 'fallback') {
+            // All standard controllers use the 8BitDo/standard mapping
+            this.update8BitDoGamepad(gamepad);
         } else {
-            // 8BitDo SN30 Pro or fallback controllers
+            // Fallback to 8BitDo mapping for any unknown types
             this.update8BitDoGamepad(gamepad);
         }
     }
