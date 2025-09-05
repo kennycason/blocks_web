@@ -182,11 +182,17 @@ class BlocksGame {
     
     // Controller configurations for different gamepad types
     getControllerConfig(gamepadId) {
+        // Debug: Log the actual gamepad ID to help with detection
+        console.log(`🔍 Detecting controller ID: "${gamepadId}"`);
+        
         // Detect controller type based on gamepad ID string
         const id = gamepadId.toLowerCase();
         
         // SNES/Switch USB Controller (preserve existing working detection)
-        if (id.includes('nintendo') || id.includes('switch')) {
+        if (id.includes('nintendo') || id.includes('switch') || 
+            id.includes('snes') || id.includes('057e') ||
+            id.includes('hori') || id.includes('pokken')) {
+            console.log(`✅ SNES/Switch controller detected!`);
             return {
                 type: 'snes-switch',
                 name: 'SNES/Switch Controller',
@@ -222,17 +228,11 @@ class BlocksGame {
             };
         }
         
-        // Xbox Controllers (One, Series X/S, 360)
-        else if (id.includes('xbox') || id.includes('microsoft')) {
-            return {
-                type: 'xbox',
-                name: 'Xbox Controller',
-                config: this.getXboxConfig()
-            };
-        }
-        
-        // 8BitDo SN30 Pro
-        else if (id.includes('8bitdo') || id.includes('sn30')) {
+        // 8BitDo SN30 Pro (check before Xbox since it might use XInput mode)
+        else if (id.includes('8bitdo') || id.includes('sn30') || 
+                id.includes('2dc8') || id.includes('8bitdo sn30 pro') ||
+                (id.includes('045e') && id.includes('028e'))) { // 8BitDo in XInput mode
+            console.log(`✅ 8BitDo SN30 Pro controller detected!`);
             return {
                 type: '8bitdo-sn30-pro',
                 name: '8BitDo SN30 Pro',
@@ -240,8 +240,20 @@ class BlocksGame {
             };
         }
         
+        // Xbox Controllers (One, Series X/S, 360)
+        else if (id.includes('xbox') || id.includes('microsoft') ||
+                (id.includes('045e') && !id.includes('028e'))) { // Microsoft vendor ID but not 8BitDo
+            console.log(`✅ Xbox controller detected!`);
+            return {
+                type: 'xbox',
+                name: 'Xbox Controller',
+                config: this.getXboxConfig()
+            };
+        }
+        
         // Default fallback - use 8BitDo mapping for unknown controllers
         else {
+            console.log(`⚠️ Unknown controller detected, using fallback mapping for: "${gamepadId}"`);
             return {
                 type: 'fallback',
                 name: 'Generic USB Controller (Standard mapping)',
@@ -1758,6 +1770,8 @@ class BlocksGame {
             
             this.updateGamepadStatus(controllerInfo.name, true);
             console.log(`🎮 Controller detected: ${controllerInfo.name} (Type: ${controllerInfo.type})`);
+            // Note: Detailed controller debug logging has been commented out to reduce noise
+            // To re-enable debug logs, search for "Debug logging" and uncomment the sections you need
         });
         
         window.addEventListener('gamepaddisconnected', (e) => {
@@ -1840,6 +1854,18 @@ class BlocksGame {
         //     console.log('Axes:', gamepad.axes.map((axis, i) => Math.abs(axis) > 0.05 ? `${i}:${axis.toFixed(2)}` : null).filter(x => x));
         // }
         
+        // Detailed axis logging (commented out to reduce noise)
+        // if (Math.random() < 0.02) {
+        //     console.log('Axis 9 (horizontal):', axes[hAxis]?.toFixed(2), 'Last:', this.lastGamepadAxes[hAxis]?.toFixed(2));
+        //     console.log('Axis 10 (vertical):', axes[vAxis]?.toFixed(2), 'Last:', this.lastGamepadAxes[vAxis]?.toFixed(2));
+        // }
+        
+        // Log gamepad mapping info for debugging (commented out to reduce noise)
+        // if (Math.random() < 0.01) {
+        //     console.log('🎮 Controller mapping:', gamepad.mapping, 'Buttons length:', buttons.length);
+        //     console.log('🎮 All axes values:', axes.map((axis, i) => `${i}:${axis?.toFixed(2)}`).filter(x => x && !x.includes('0.00')));
+        // }
+        
         const currentState = {};
         
         // Track button states
@@ -1904,6 +1930,16 @@ class BlocksGame {
         this.lastGamepadAxes[hAxis] = axes[hAxis] || 0;
         this.lastGamepadAxes[vAxis] = axes[vAxis] || 0;
         
+        // All debug logging below has been commented out to reduce console noise
+        // Uncomment individual sections if you need to debug specific controller issues
+        
+        // Change detection logging (commented out)
+        // const hAxisChange = Math.abs((axes[hAxis] || 0) - this.lastGamepadAxes[hAxis]);
+        // const vAxisChange = Math.abs((axes[vAxis] || 0) - this.lastGamepadAxes[vAxis]);
+        // if (Math.random() < 0.02) {
+        //     console.log('Axis change detection:', hAxisChange.toFixed(2), vAxisChange.toFixed(2));
+        // }
+        
         // Process button and movement inputs
         this.processGamepadInputs(currentState, { dpadLeft, dpadRight, dpadUp, dpadDown });
     }
@@ -1919,6 +1955,12 @@ class BlocksGame {
         //     console.log('🎮 8BitDo Gamepad Debug:');
         //     console.log('Buttons:', gamepad.buttons.map((btn, i) => btn.pressed ? `${i}:pressed` : null).filter(x => x));
         //     console.log('Axes:', gamepad.axes.map((axis, i) => Math.abs(axis) > 0.05 ? `${i}:${axis.toFixed(2)}` : null).filter(x => x));
+        // }
+        
+        // Additional debug logging (commented out to reduce noise)
+        // if (Math.random() < 0.01) {
+        //     console.log('🎮 8BitDo Controller mapping:', gamepad.mapping, 'Buttons length:', buttons.length);
+        //     console.log('🎮 8BitDo All axes values:', axes.map((axis, i) => `${i}:${axis?.toFixed(2)}`).filter(x => x && !x.includes('0.00')));
         // }
         
         const currentState = {};
