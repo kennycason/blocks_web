@@ -118,7 +118,17 @@ class BlocksGame {
             { name: 'crystal-realm', start: 80, end: 86 },
             { name: 'time-fracture', start: 85, end: 91 },
             { name: 'void-between-worlds', start: 90, end: 96 },
-            { name: 'returning-dawn', start: 95, end: 100 }
+            { name: 'returning-dawn', start: 95, end: 100 },
+            
+            // Extended Journey (100-140%) - More variety before cycling
+            { name: 'cosmic-awakening', start: 100, end: 106 },
+            { name: 'stellar-nursery', start: 105, end: 111 },
+            { name: 'quantum-realm', start: 110, end: 116 },
+            { name: 'time-distortion', start: 115, end: 121 },
+            { name: 'dimensional-shift', start: 120, end: 126 },
+            { name: 'energy-singularity', start: 125, end: 131 },
+            { name: 'universal-harmony', start: 130, end: 136 },
+            { name: 'cosmic-reset', start: 135, end: 140 }
         ];
         
         // Sprite sheet for piece textures
@@ -838,8 +848,8 @@ class BlocksGame {
         // Advance evolution by 0.1% each piece (slow, steady progress)
         this.evolutionProgress += 0.2;
         
-        // Cycle back to beginning after 100%
-        if (this.evolutionProgress >= 100) {
+        // Cycle back to beginning after 140% (extended journey)
+        if (this.evolutionProgress >= 140) {
             this.evolutionProgress = 0;
         }
         
@@ -850,8 +860,8 @@ class BlocksGame {
         // Advance evolution by 1% per line cleared (major progress!)
         this.evolutionProgress += linesCleared * 1.0;
         
-        // Cycle back to beginning after 100%
-        if (this.evolutionProgress >= 100) {
+        // Cycle back to beginning after 140% (extended journey)
+        if (this.evolutionProgress >= 140) {
             this.evolutionProgress = 0;
         }
         
@@ -978,15 +988,51 @@ class BlocksGame {
             const t = (progress - 82) / 10;
             gradient = `linear-gradient(${t * 180}deg, 
                 #E6E6FA 0%, #DDA0DD 25%, #DA70D6 50%, #C71585 75%, #B0E0E6 100%)`;
+        } else if (progress < 106) {
+            // Cosmic Awakening: Bright cosmic energy
+            const t = (progress - 100) / 6;
+            gradient = `radial-gradient(ellipse at center, 
+                ${this.lerpColor('#E6E6FA', '#FFD700', t)} 0%, 
+                ${this.lerpColor('#DDA0DD', '#FFA500', t)} 30%, 
+                ${this.lerpColor('#DA70D6', '#FF6347', t)} 60%, 
+                ${this.lerpColor('#C71585', '#FF4500', t)} 80%, 
+                ${this.lerpColor('#B0E0E6', '#8B0000', t)} 100%)`;
+        } else if (progress < 116) {
+            // Stellar Nursery: Star birth regions
+            const t = (progress - 106) / 10;
+            gradient = `radial-gradient(circle at 30% 70%, 
+                ${this.lerpColor('#FFD700', '#FF69B4', t)} 0%, 
+                ${this.lerpColor('#FFA500', '#FF1493', t)} 25%, 
+                ${this.lerpColor('#FF6347', '#8A2BE2', t)} 50%, 
+                ${this.lerpColor('#FF4500', '#4B0082', t)} 75%, 
+                ${this.lerpColor('#8B0000', '#191970', t)} 100%)`;
+        } else if (progress < 126) {
+            // Quantum Realm: Particle physics
+            const t = (progress - 116) / 10;
+            gradient = `conic-gradient(from 45deg, 
+                ${this.lerpColor('#FF69B4', '#00FFFF', t)}, 
+                ${this.lerpColor('#FF1493', '#00FF00', t)}, 
+                ${this.lerpColor('#8A2BE2', '#FFFF00', t)}, 
+                ${this.lerpColor('#4B0082', '#FF00FF', t)}, 
+                ${this.lerpColor('#191970', '#00FFFF', t)})`;
+        } else if (progress < 136) {
+            // Time Distortion & Dimensional Shift: Reality bending
+            const t = (progress - 126) / 10;
+            gradient = `linear-gradient(${progress * 3}deg, 
+                ${this.lerpColor('#00FFFF', '#000000', t)} 0%, 
+                ${this.lerpColor('#00FF00', '#FFFFFF', t)} 25%, 
+                ${this.lerpColor('#FFFF00', '#808080', t)} 50%, 
+                ${this.lerpColor('#FF00FF', '#C0C0C0', t)} 75%, 
+                ${this.lerpColor('#00FFFF', '#000000', t)} 100%)`;
         } else {
-            // Returning Dawn: Back to day
-            const t = (progress - 92) / 8;
+            // Cosmic Reset: Return to beginning
+            const t = (progress - 136) / 4;
             gradient = `linear-gradient(to bottom, 
-                ${this.lerpColor('#E6E6FA', '#87CEEB', t)} 0%, 
-                ${this.lerpColor('#DDA0DD', '#98D8E8', t)} 30%, 
-                ${this.lerpColor('#DA70D6', '#B6E5F0', t)} 60%, 
-                ${this.lerpColor('#C71585', '#32CD32', t)} 85%, 
-                ${this.lerpColor('#B0E0E6', '#228B22', t)} 100%)`;
+                ${this.lerpColor('#000000', '#87CEEB', t)} 0%, 
+                ${this.lerpColor('#FFFFFF', '#98D8E8', t)} 30%, 
+                ${this.lerpColor('#808080', '#B6E5F0', t)} 60%, 
+                ${this.lerpColor('#C0C0C0', '#32CD32', t)} 85%, 
+                ${this.lerpColor('#000000', '#228B22', t)} 100%)`;
         }
         
         body.style.background = gradient;
@@ -1215,8 +1261,70 @@ class BlocksGame {
             }
         }
         
-        // Portal rings appear during major transitions
-        if ((progress >= 48 && progress <= 54) || (progress >= 68 && progress <= 74) || (progress >= 88 && progress <= 94)) {
+        // Extended journey effects (100-140%)
+        if (progress >= 100 && progress < 112) {
+            // Cosmic Awakening & Stellar Nursery: Aurora and energy waves
+            if (aurora) {
+                aurora.style.display = 'block';
+                const t = (progress - 100) / 12;
+                aurora.style.opacity = `${0.6 + Math.sin(t * Math.PI * 2) * 0.4}`;
+                aurora.style.transform = `rotate(${t * 360}deg) scale(${1 + t * 0.5})`;
+            }
+            if (energy) {
+                energy.style.display = 'block';
+                const t = (progress - 100) / 12;
+                energy.style.opacity = `${0.8 + Math.sin(t * Math.PI * 3) * 0.2}`;
+            }
+        } else if (progress >= 110 && progress < 126) {
+            // Quantum Realm & Time Distortion: All reality-bending effects
+            if (timeWarp) {
+                timeWarp.style.display = 'block';
+                const t = (progress - 110) / 16;
+                timeWarp.style.opacity = `${0.7 + Math.sin(t * Math.PI * 2) * 0.3}`;
+                timeWarp.style.transform = `scale(${1 + Math.sin(t * Math.PI) * 0.5})`;
+            }
+            if (rifts) {
+                rifts.style.display = 'block';
+                const t = (progress - 110) / 16;
+                rifts.style.opacity = `${0.5 + t * 0.4}`;
+            }
+            spirals.forEach((spiral, index) => {
+                if (spiral) {
+                    spiral.style.display = 'block';
+                    const t = (progress - 110) / 16;
+                    spiral.style.opacity = `${0.4 + Math.sin(t * Math.PI + index) * 0.4}`;
+                    spiral.style.transform = `scale(${0.8 + t * 0.6}) rotate(${t * 1080 + index * 120}deg)`;
+                }
+            });
+        } else if (progress >= 125 && progress < 140) {
+            // Energy Singularity to Cosmic Reset: Maximum chaos then calm
+            const t = (progress - 125) / 15;
+            if (t < 0.7) {
+                // Maximum chaos phase
+                [lightning, plasma, tentacles, chaos, energy].forEach(el => {
+                    if (el) {
+                        el.style.display = 'block';
+                        el.style.opacity = `${0.8 + Math.sin(t * Math.PI * 4) * 0.2}`;
+                        el.style.transform = `scale(${1 + Math.sin(t * Math.PI * 6) * 0.3})`;
+                    }
+                });
+            } else {
+                // Cosmic reset: Fade everything out
+                const fadeT = (t - 0.7) / 0.3;
+                [lightning, plasma, tentacles, chaos, energy, aurora, timeWarp, rifts, ...spirals].forEach(el => {
+                    if (el) {
+                        el.style.display = 'block';
+                        el.style.opacity = `${(1 - fadeT) * 0.5}`;
+                        el.style.transform = `scale(${1 - fadeT * 0.5})`;
+                    }
+                });
+            }
+        }
+        
+        // Portal rings appear during major transitions (including new ones)
+        if ((progress >= 48 && progress <= 54) || (progress >= 68 && progress <= 74) || 
+            (progress >= 88 && progress <= 94) || (progress >= 108 && progress <= 114) || 
+            (progress >= 128 && progress <= 134)) {
             if (portal) {
                 portal.style.display = 'block';
                 const intensity = Math.sin((progress % 6) * Math.PI / 6);
@@ -1350,13 +1458,13 @@ class BlocksGame {
     setupGamepadSupport() {
         // Gamepad connection events
         window.addEventListener('gamepadconnected', (e) => {
-            console.log('🎮 Gamepad connected:', e.gamepad.id);
+            // console.log('🎮 Gamepad connected:', e.gamepad.id);
             this.gamepadIndex = e.gamepad.index;
             this.updateGamepadStatus(e.gamepad.id, true);
         });
         
         window.addEventListener('gamepaddisconnected', (e) => {
-            console.log('🎮 Gamepad disconnected');
+            // console.log('🎮 Gamepad disconnected');
             if (e.gamepad.index === this.gamepadIndex) {
                 this.gamepadIndex = null;
                 this.updateGamepadStatus('', false);
@@ -1367,7 +1475,7 @@ class BlocksGame {
         const gamepads = navigator.getGamepads();
         for (let i = 0; i < gamepads.length; i++) {
             if (gamepads[i]) {
-                console.log('🎮 Found existing gamepad:', gamepads[i].id);
+                // console.log('🎮 Found existing gamepad:', gamepads[i].id);
                 this.gamepadIndex = i;
                 this.updateGamepadStatus(gamepads[i].id, true);
                 break;
@@ -1412,12 +1520,12 @@ class BlocksGame {
         const buttons = gamepad.buttons;
         const axes = gamepad.axes;
         
-        // Debug logging for gamepad inputs
-        if (Math.random() < 0.02) { // Log occasionally to avoid spam
-            console.log('🎮 Gamepad Debug:');
-            console.log('Buttons:', gamepad.buttons.map((btn, i) => btn.pressed ? `${i}:pressed` : null).filter(x => x));
-            console.log('Axes:', gamepad.axes.map((axis, i) => Math.abs(axis) > 0.05 ? `${i}:${axis.toFixed(2)}` : null).filter(x => x));
-        }
+        // Debug logging for gamepad inputs (commented out to reduce noise)
+        // if (Math.random() < 0.02) { // Log occasionally to avoid spam
+        //     console.log('🎮 Gamepad Debug:');
+        //     console.log('Buttons:', gamepad.buttons.map((btn, i) => btn.pressed ? `${i}:pressed` : null).filter(x => x));
+        //     console.log('Axes:', gamepad.axes.map((axis, i) => Math.abs(axis) > 0.05 ? `${i}:${axis.toFixed(2)}` : null).filter(x => x));
+        // }
         const currentState = {};
         
         // Track button states
@@ -1436,37 +1544,37 @@ class BlocksGame {
         const axis9Change = Math.abs((axes[9] || 0) - this.lastGamepadAxes[9]);
         const axis10Change = Math.abs((axes[10] || 0) - this.lastGamepadAxes[10]);
         
-        // Detailed axis logging
-        if (Math.random() < 0.02) {
-            console.log('Axis 9 (horizontal):', axes[9]?.toFixed(2), 'Last:', this.lastGamepadAxes[9]?.toFixed(2), 'Change:', axis9Change?.toFixed(2));
-            console.log('Axis 10 (vertical):', axes[10]?.toFixed(2), 'Last:', this.lastGamepadAxes[10]?.toFixed(2), 'Change:', axis10Change?.toFixed(2));
-        }
+        // Detailed axis logging (commented out to reduce noise)
+        // if (Math.random() < 0.02) {
+        //     console.log('Axis 9 (horizontal):', axes[9]?.toFixed(2), 'Last:', this.lastGamepadAxes[9]?.toFixed(2), 'Change:', axis9Change?.toFixed(2));
+        //     console.log('Axis 10 (vertical):', axes[10]?.toFixed(2), 'Last:', this.lastGamepadAxes[10]?.toFixed(2), 'Change:', axis10Change?.toFixed(2));
+        // }
         
         // D-pad detection with debug logging
         let dpadLeft = false, dpadRight = false, dpadUp = false, dpadDown = false;
         
-        // Log gamepad mapping info for debugging
-        if (Math.random() < 0.01) {
-            console.log('🎮 Controller mapping:', gamepad.mapping, 'Buttons length:', buttons.length);
-            console.log('🎮 All axes values:', axes.map((axis, i) => `${i}:${axis?.toFixed(2)}`).filter(x => x && !x.includes('0.00')));
-        }
+        // Log gamepad mapping info for debugging (commented out to reduce noise)
+        // if (Math.random() < 0.01) {
+        //     console.log('🎮 Controller mapping:', gamepad.mapping, 'Buttons length:', buttons.length);
+        //     console.log('🎮 All axes values:', axes.map((axis, i) => `${i}:${axis?.toFixed(2)}`).filter(x => x && !x.includes('0.00')));
+        // }
         
         // Standard D-pad button detection (buttons 12-15) - try first
         if (buttons[12] && buttons[12].pressed) {
             dpadUp = true;
-            console.log('🎮 D-pad UP (button 12) detected');
+            // console.log('🎮 D-pad UP (button 12) detected');
         }
         if (buttons[13] && buttons[13].pressed) {
             dpadDown = true;
-            console.log('🎮 D-pad DOWN (button 13) detected');
+            // console.log('🎮 D-pad DOWN (button 13) detected');
         }
         if (buttons[14] && buttons[14].pressed) {
             dpadLeft = true;
-            console.log('🎮 D-pad LEFT (button 14) detected');
+            // console.log('🎮 D-pad LEFT (button 14) detected');
         }
         if (buttons[15] && buttons[15].pressed) {
             dpadRight = true;
-            console.log('🎮 D-pad RIGHT (button 15) detected');
+            // console.log('🎮 D-pad RIGHT (button 15) detected');
         }
         
         // IMPROVED AXIS DETECTION FOR DIAGONAL MOVEMENT
@@ -1475,17 +1583,17 @@ class BlocksGame {
             // LEFT detection
             if (axes[9] > 0.5 && axes[9] < 1.0) {  // 0.71 value = LEFT (working!)
                 dpadLeft = true;
-                console.log('🎮 LEFT detected! axis 9 =', axes[9]);
+                // console.log('🎮 LEFT detected! axis 9 =', axes[9]);
             } 
             // RIGHT detection
             else if (axes[9] < -0.2 && axes[9] > -0.6) {  // -0.4285714 = RIGHT (working!)
                 dpadRight = true;
-                console.log('🎮 RIGHT detected! axis 9 =', axes[9]);
+                // console.log('🎮 RIGHT detected! axis 9 =', axes[9]);
             }
             // DOWN detection from axis 9 (when no horizontal movement)
             else if (axes[9] > 0.1 && axes[9] < 0.3) {  // 0.14285719 = DOWN (soft drop like 'S')
                 dpadDown = true;
-                console.log('🎮 DOWN detected! (soft drop like S key) axis 9 =', axes[9]);
+                // console.log('🎮 DOWN detected! (soft drop like S key) axis 9 =', axes[9]);
             }
         }
         
@@ -1494,11 +1602,11 @@ class BlocksGame {
         if (axes[10] !== undefined) {
             if (axes[10] > 0.3) {
                 dpadDown = true;
-                console.log('🎮 DOWN detected from axis 10! value =', axes[10]);
+                // console.log('🎮 DOWN detected from axis 10! value =', axes[10]);
             }
             if (axes[10] < -0.3) {
                 dpadUp = true;
-                console.log('🎮 UP detected from axis 10! value =', axes[10]);
+                // console.log('🎮 UP detected from axis 10! value =', axes[10]);
             }
         }
         
@@ -1529,18 +1637,18 @@ class BlocksGame {
             this.handleGamepadMovement('right', dpadRight, 1, now);
             // Handle down button like keyboard 'S' key - change drop speed
             if (dpadDown && !this.gamepadDownPressed) {
-                console.log('🎮 D-pad Down pressed - speeding up drop!');
+                // console.log('🎮 D-pad Down pressed - speeding up drop!');
                 this.gamepadDownPressed = true;
                 this.originalDropSpeed = this.dropSpeed; // Store current drop speed
                 this.dropSpeed = 50; // Fast drop speed same as keyboard 'S'
             } else if (!dpadDown && this.gamepadDownPressed) {
-                console.log('🎮 D-pad Down released - restoring normal drop speed!');
+                // console.log('🎮 D-pad Down released - restoring normal drop speed!');
                 this.gamepadDownPressed = false;
                 this.dropSpeed = this.originalDropSpeed; // Restore original speed
                 this.calculateDropSpeed(); // Recalculate proper speed for current level
             }
             if (dpadUp) { // D-pad Up (hard drop)
-                console.log('🎮 D-pad Up detected!');
+                // console.log('🎮 D-pad Up detected!');
                 this.hardDrop();
             }
         }
@@ -1549,7 +1657,7 @@ class BlocksGame {
         if (wasPressed(9)) { // Start button
             if (this.gameOver) {
                 // If game is over, start button restarts the game
-                console.log('🎮 Start button pressed - restarting game!');
+                // console.log('🎮 Start button pressed - restarting game!');
                 this.newGame();
             } else {
                 // During game, start button pauses/unpauses
@@ -1569,11 +1677,11 @@ class BlocksGame {
             // Check cooldown to prevent accidental rapid moves
             const timeSinceLastMove = now - this.lastGamepadMoveTime;
             if (timeSinceLastMove < this.gamepadMoveCooldown) {
-                console.log(`🎮 ${direction.toUpperCase()} button pressed but still in cooldown (${timeSinceLastMove}ms)`);
+                // console.log(`🎮 ${direction.toUpperCase()} button pressed but still in cooldown (${timeSinceLastMove}ms)`);
                 return; // Ignore this press, still in cooldown
             }
             
-            console.log(`🎮 ${direction.toUpperCase()} button pressed - immediate move!`);
+            // console.log(`🎮 ${direction.toUpperCase()} button pressed - immediate move!`);
             state.pressed = true;
             state.startTime = now;
             state.hasMoved = true;
@@ -1585,7 +1693,7 @@ class BlocksGame {
         
         // Handle button release
         if (!isPressed && state.pressed) {
-            console.log(`🎮 ${direction.toUpperCase()} button released`);
+            // console.log(`🎮 ${direction.toUpperCase()} button released`);
             state.pressed = false;
             state.hasMoved = false;
             state.startTime = 0;
@@ -1600,7 +1708,7 @@ class BlocksGame {
                 const timeSinceLastMove = now - this.lastGamepadMoveTime;
                 
                 if (timeSinceLastMove > this.gamepadMoveDelay) {
-                    console.log(`🎮 ${direction.toUpperCase()} continuous movement`);
+                    // console.log(`🎮 ${direction.toUpperCase()} continuous movement`);
                     this.movePiece(moveDirection, 0);
                     this.lastGamepadMoveTime = now;
                 }
