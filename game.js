@@ -84,8 +84,14 @@ class BlocksGame {
         this.lastGamepadState = {};
         this.lastGamepadAxes = {};
         this.gamepadDeadzone = 0.5;
-        this.gamepadMoveDelay = 50; // 50ms delay for left/right to prevent double-moves
+        this.gamepadMoveDelay = 40; // 40ms delay for left/right continuous movement (was 50ms)
         this.lastGamepadMoveTime = 0;
+        this.gamepadMoveState = {
+            left: { pressed: false, startTime: 0, hasMoved: false },
+            right: { pressed: false, startTime: 0, hasMoved: false }
+        };
+        this.gamepadInitialDelay = 200; // Delay before continuous movement starts (between 150ms and 250ms)
+        this.gamepadMoveCooldown = 80; // Minimum time between any gamepad moves (prevents double-tap accidents)
         this.gamepadDownPressed = false; // Track if down is currently pressed
         this.originalDropSpeed = this.dropSpeed; // Store original drop speed
         
@@ -776,6 +782,10 @@ class BlocksGame {
         // Reset gamepad state
         this.gamepadDownPressed = false;
         this.originalDropSpeed = this.dropSpeed;
+        
+        // Reset gamepad movement state
+        this.gamepadMoveState.left = { pressed: false, startTime: 0, hasMoved: false };
+        this.gamepadMoveState.right = { pressed: false, startTime: 0, hasMoved: false };
         
         // Reset environment evolution
         this.evolutionProgress = 0;
@@ -1513,18 +1523,10 @@ class BlocksGame {
                 this.rotatePiece(2);
             }
             
-            // Movement controls with throttling to prevent double-moves
+            // Advanced movement controls with initial delay (like keyboard)
             const now = Date.now();
-            if (dpadLeft && (now - this.lastGamepadMoveTime > this.gamepadMoveDelay)) {
-                console.log('🎮 D-pad Left detected!');
-                this.movePiece(-1, 0);
-                this.lastGamepadMoveTime = now;
-            }
-            if (dpadRight && (now - this.lastGamepadMoveTime > this.gamepadMoveDelay)) {
-                console.log('🎮 D-pad Right detected!');
-                this.movePiece(1, 0);
-                this.lastGamepadMoveTime = now;
-            }
+            this.handleGamepadMovement('left', dpadLeft, -1, now);
+            this.handleGamepadMovement('right', dpadRight, 1, now);
             // Handle down button like keyboard 'S' key - change drop speed
             if (dpadDown && !this.gamepadDownPressed) {
                 console.log('🎮 D-pad Down pressed - speeding up drop!');
@@ -1557,6 +1559,53 @@ class BlocksGame {
         
         // Store current state for next frame
         this.lastGamepadState = { ...currentState };
+    }
+    
+    handleGamepadMovement(direction, isPressed, moveDirection, now) {
+        const state = this.gamepadMoveState[direction];
+        
+        // Handle button press start
+        if (isPressed && !state.pressed) {
+            // Check cooldown to prevent accidental rapid moves
+            const timeSinceLastMove = now - this.lastGamepadMoveTime;
+            if (timeSinceLastMove < this.gamepadMoveCooldown) {
+                console.log(`🎮 ${direction.toUpperCase()} button pressed but still in cooldown (${timeSinceLastMove}ms)`);
+                return; // Ignore this press, still in cooldown
+            }
+            
+            console.log(`🎮 ${direction.toUpperCase()} button pressed - immediate move!`);
+            state.pressed = true;
+            state.startTime = now;
+            state.hasMoved = true;
+            
+            // Immediate first move (like keyboard)
+            this.movePiece(moveDirection, 0);
+            this.lastGamepadMoveTime = now; // Update last move time
+        }
+        
+        // Handle button release
+        if (!isPressed && state.pressed) {
+            console.log(`🎮 ${direction.toUpperCase()} button released`);
+            state.pressed = false;
+            state.hasMoved = false;
+            state.startTime = 0;
+        }
+        
+        // Handle continuous movement after initial delay
+        if (isPressed && state.pressed && state.hasMoved) {
+            const timeSinceStart = now - state.startTime;
+            
+            // After initial delay, start continuous movement
+            if (timeSinceStart > this.gamepadInitialDelay) {
+                const timeSinceLastMove = now - this.lastGamepadMoveTime;
+                
+                if (timeSinceLastMove > this.gamepadMoveDelay) {
+                    console.log(`🎮 ${direction.toUpperCase()} continuous movement`);
+                    this.movePiece(moveDirection, 0);
+                    this.lastGamepadMoveTime = now;
+                }
+            }
+        }
     }
     
     gameLoop() {
