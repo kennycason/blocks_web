@@ -79,6 +79,7 @@ class BlocksGame {
         
         // Gamepad support
         this.gamepadIndex = null;
+        this.gamepadType = null; // 'snes-switch', '8bitdo-sn30-pro', 'fallback'
         this.gamepadButtons = {};
         this.gamepadAxes = {};
         this.lastGamepadState = {};
@@ -177,6 +178,110 @@ class BlocksGame {
         this.setupEventListeners();
         this.setupGamepadSupport();
         this.gameLoop();
+    }
+    
+    // Controller configurations for different gamepad types
+    getControllerConfig(gamepadId) {
+        // Detect controller type based on gamepad ID string
+        const id = gamepadId.toLowerCase();
+        
+        if (id.includes('nintendo') || id.includes('switch') || 
+            (id.includes('vendor: 057e') && id.includes('product: 2006'))) {
+            return {
+                type: 'snes-switch',
+                name: 'SNES/Switch Controller',
+                config: this.getSNESSwitchConfig()
+            };
+        } else if (id.includes('8bitdo') || id.includes('sn30') || 
+                  (id.includes('vendor: 2dc8') && id.includes('product: 6001'))) {
+            return {
+                type: '8bitdo-sn30-pro',
+                name: '8BitDo SN30 Pro',
+                config: this.get8BitDoSN30ProConfig()
+            };
+        } else {
+            // Default fallback - use 8BitDo mapping for unknown controllers
+            return {
+                type: 'fallback',
+                name: 'Generic Controller (8BitDo mapping)',
+                config: this.get8BitDoSN30ProConfig()
+            };
+        }
+    }
+    
+    // SNES/Switch controller configuration (preserve existing working logic)
+    getSNESSwitchConfig() {
+        return {
+            buttons: {
+                rotateCW: [1, 5],      // A or R shoulder
+                rotateCCW: [0, 4],     // B or L shoulder
+                rotate180: [2, 3],     // Y or X
+                pause: [9],            // Start
+                select: [8]            // Select
+            },
+            dpad: {
+                useAxes: true,
+                axes: {
+                    horizontal: 9,     // Axis 9 for horizontal movement
+                    vertical: 10       // Axis 10 for vertical movement
+                },
+                axisMapping: {
+                    // Axis 9 horizontal mapping (preserved from working code)
+                    left: { min: 0.5, max: 1.0 },     // 0.71 value = LEFT
+                    right: { min: -0.6, max: -0.2 },  // -0.4285714 = RIGHT
+                    down: { min: 0.1, max: 0.3 }      // 0.14285719 = DOWN (soft drop)
+                },
+                // Axis 10 vertical mapping
+                verticalAxis: {
+                    down: { min: 0.3 },   // Down on vertical axis
+                    up: { min: -0.3 }     // Up on vertical axis (negative)
+                },
+                // Standard D-pad buttons as fallback
+                buttons: {
+                    up: 12,
+                    down: 13,
+                    left: 14,
+                    right: 15
+                }
+            }
+        };
+    }
+    
+    // 8BitDo SN30 Pro controller configuration (and fallback for unknown controllers)
+    get8BitDoSN30ProConfig() {
+        return {
+            buttons: {
+                rotateCW: [1, 5],      // A or R shoulder
+                rotateCCW: [0, 4],     // B or L shoulder  
+                rotate180: [2, 3],     // Y or X
+                pause: [9],            // Start
+                select: [8]            // Select
+            },
+            dpad: {
+                useAxes: true,
+                axes: {
+                    horizontal: 0,     // Left stick horizontal for 8BitDo
+                    vertical: 1        // Left stick vertical for 8BitDo
+                },
+                axisMapping: {
+                    // Standard axis mapping for 8BitDo
+                    left: { min: -1.0, max: -0.5 },
+                    right: { min: 0.5, max: 1.0 },
+                    down: { min: 0.5, max: 1.0 }      // Down on vertical axis
+                },
+                verticalAxis: {
+                    down: { min: 0.5 },   // Down on vertical axis
+                    up: { min: -0.5 }     // Up on vertical axis (negative)
+                },
+                // Standard D-pad buttons
+                buttons: {
+                    up: 12,
+                    down: 13,
+                    left: 14,
+                    right: 15
+                }
+            }
+        };
     }
     
     loadSpriteSheet() {
@@ -1460,13 +1565,22 @@ class BlocksGame {
         window.addEventListener('gamepadconnected', (e) => {
             // console.log('🎮 Gamepad connected:', e.gamepad.id);
             this.gamepadIndex = e.gamepad.index;
-            this.updateGamepadStatus(e.gamepad.id, true);
+            
+            // Detect controller type and configure
+            const controllerInfo = this.getControllerConfig(e.gamepad.id);
+            this.gamepadType = controllerInfo.type;
+            this.currentControllerConfig = controllerInfo.config;
+            
+            this.updateGamepadStatus(controllerInfo.name, true);
+            console.log(`🎮 Controller detected: ${controllerInfo.name} (Type: ${controllerInfo.type})`);
         });
         
         window.addEventListener('gamepaddisconnected', (e) => {
             // console.log('🎮 Gamepad disconnected');
             if (e.gamepad.index === this.gamepadIndex) {
                 this.gamepadIndex = null;
+                this.gamepadType = null;
+                this.currentControllerConfig = null;
                 this.updateGamepadStatus('', false);
             }
         });
@@ -1477,7 +1591,14 @@ class BlocksGame {
             if (gamepads[i]) {
                 // console.log('🎮 Found existing gamepad:', gamepads[i].id);
                 this.gamepadIndex = i;
-                this.updateGamepadStatus(gamepads[i].id, true);
+                
+                // Detect controller type and configure
+                const controllerInfo = this.getControllerConfig(gamepads[i].id);
+                this.gamepadType = controllerInfo.type;
+                this.currentControllerConfig = controllerInfo.config;
+                
+                this.updateGamepadStatus(controllerInfo.name, true);
+                console.log(`🎮 Controller detected: ${controllerInfo.name} (Type: ${controllerInfo.type})`);
                 break;
             }
         }
@@ -1498,34 +1619,33 @@ class BlocksGame {
     }
     
     updateGamepad() {
-        if (this.gamepadIndex === null) return;
+        if (this.gamepadIndex === null || !this.currentControllerConfig) return;
         
         const gamepad = navigator.getGamepads()[this.gamepadIndex];
         if (!gamepad) return;
         
-        // SNES/Switch Controller Button Mapping:
-        // 0 = B (CCW rotation)
-        // 1 = A (CW rotation) 
-        // 2 = Y (180° rotation)
-        // 3 = X (180° rotation)
-        // 4 = L shoulder (CCW rotation)
-        // 5 = R shoulder (CW rotation)
-        // 8 = Select
-        // 9 = Start (pause)
-        // 12 = D-pad Up (traditional) or Axes[7] < -0.5
-        // 13 = D-pad Down (traditional) or Axes[7] > 0.5  
-        // 14 = D-pad Left (traditional) or Axes[6] < -0.5
-        // 15 = D-pad Right (traditional) or Axes[6] > 0.5
-        
+        // Use controller-specific update function based on detected type
+        if (this.gamepadType === 'snes-switch') {
+            this.updateSNESSwitchGamepad(gamepad);
+        } else {
+            // 8BitDo SN30 Pro or fallback controllers
+            this.update8BitDoGamepad(gamepad);
+        }
+    }
+    
+    // SNES/Switch controller update (preserves existing working logic)
+    updateSNESSwitchGamepad(gamepad) {
         const buttons = gamepad.buttons;
         const axes = gamepad.axes;
+        const config = this.currentControllerConfig;
         
         // Debug logging for gamepad inputs (commented out to reduce noise)
         // if (Math.random() < 0.02) { // Log occasionally to avoid spam
-        //     console.log('🎮 Gamepad Debug:');
+        //     console.log('🎮 SNES/Switch Gamepad Debug:');
         //     console.log('Buttons:', gamepad.buttons.map((btn, i) => btn.pressed ? `${i}:pressed` : null).filter(x => x));
         //     console.log('Axes:', gamepad.axes.map((axis, i) => Math.abs(axis) > 0.05 ? `${i}:${axis.toFixed(2)}` : null).filter(x => x));
         // }
+        
         const currentState = {};
         
         // Track button states
@@ -1533,86 +1653,134 @@ class BlocksGame {
             currentState[i] = buttons[i].pressed;
         }
         
-        // Switch controller D-pad detection using change-based logic
-        // Your controller: axis 9 = horizontal (rests at ~1.29), axis 10 = vertical
-        
+        // SNES/Switch controller D-pad detection using existing working logic
         // Store previous axis values for change detection
-        if (!this.lastGamepadAxes[9]) this.lastGamepadAxes[9] = axes[9] || 0;
-        if (!this.lastGamepadAxes[10]) this.lastGamepadAxes[10] = axes[10] || 0;
+        const hAxis = config.dpad.axes.horizontal;
+        const vAxis = config.dpad.axes.vertical;
         
-        // Detect significant changes from resting position
-        const axis9Change = Math.abs((axes[9] || 0) - this.lastGamepadAxes[9]);
-        const axis10Change = Math.abs((axes[10] || 0) - this.lastGamepadAxes[10]);
+        if (!this.lastGamepadAxes[hAxis]) this.lastGamepadAxes[hAxis] = axes[hAxis] || 0;
+        if (!this.lastGamepadAxes[vAxis]) this.lastGamepadAxes[vAxis] = axes[vAxis] || 0;
         
-        // Detailed axis logging (commented out to reduce noise)
-        // if (Math.random() < 0.02) {
-        //     console.log('Axis 9 (horizontal):', axes[9]?.toFixed(2), 'Last:', this.lastGamepadAxes[9]?.toFixed(2), 'Change:', axis9Change?.toFixed(2));
-        //     console.log('Axis 10 (vertical):', axes[10]?.toFixed(2), 'Last:', this.lastGamepadAxes[10]?.toFixed(2), 'Change:', axis10Change?.toFixed(2));
-        // }
-        
-        // D-pad detection with debug logging
+        // D-pad detection
         let dpadLeft = false, dpadRight = false, dpadUp = false, dpadDown = false;
         
-        // Log gamepad mapping info for debugging (commented out to reduce noise)
-        // if (Math.random() < 0.01) {
-        //     console.log('🎮 Controller mapping:', gamepad.mapping, 'Buttons length:', buttons.length);
-        //     console.log('🎮 All axes values:', axes.map((axis, i) => `${i}:${axis?.toFixed(2)}`).filter(x => x && !x.includes('0.00')));
-        // }
-        
         // Standard D-pad button detection (buttons 12-15) - try first
-        if (buttons[12] && buttons[12].pressed) {
+        if (buttons[config.dpad.buttons.up] && buttons[config.dpad.buttons.up].pressed) {
             dpadUp = true;
-            // console.log('🎮 D-pad UP (button 12) detected');
         }
-        if (buttons[13] && buttons[13].pressed) {
+        if (buttons[config.dpad.buttons.down] && buttons[config.dpad.buttons.down].pressed) {
             dpadDown = true;
-            // console.log('🎮 D-pad DOWN (button 13) detected');
         }
-        if (buttons[14] && buttons[14].pressed) {
+        if (buttons[config.dpad.buttons.left] && buttons[config.dpad.buttons.left].pressed) {
             dpadLeft = true;
-            // console.log('🎮 D-pad LEFT (button 14) detected');
         }
-        if (buttons[15] && buttons[15].pressed) {
+        if (buttons[config.dpad.buttons.right] && buttons[config.dpad.buttons.right].pressed) {
             dpadRight = true;
-            // console.log('🎮 D-pad RIGHT (button 15) detected');
         }
         
-        // IMPROVED AXIS DETECTION FOR DIAGONAL MOVEMENT
+        // PRESERVED SNES/Switch axis detection logic (working!)
         // Handle horizontal movement (axis 9) - NOTE: axis 9 can only be one value at a time
-        if (axes[9] !== undefined) {
-            // LEFT detection
-            if (axes[9] > 0.5 && axes[9] < 1.0) {  // 0.71 value = LEFT (working!)
+        if (axes[hAxis] !== undefined) {
+            const axisValue = axes[hAxis];
+            // LEFT detection - preserved exact working values
+            if (axisValue > 0.5 && axisValue < 1.0) {  // 0.71 value = LEFT (working!)
                 dpadLeft = true;
-                // console.log('🎮 LEFT detected! axis 9 =', axes[9]);
             } 
-            // RIGHT detection
-            else if (axes[9] < -0.2 && axes[9] > -0.6) {  // -0.4285714 = RIGHT (working!)
+            // RIGHT detection - preserved exact working values
+            else if (axisValue < -0.2 && axisValue > -0.6) {  // -0.4285714 = RIGHT (working!)
                 dpadRight = true;
-                // console.log('🎮 RIGHT detected! axis 9 =', axes[9]);
             }
-            // DOWN detection from axis 9 (when no horizontal movement)
-            else if (axes[9] > 0.1 && axes[9] < 0.3) {  // 0.14285719 = DOWN (soft drop like 'S')
+            // DOWN detection from axis 9 (when no horizontal movement) - preserved
+            else if (axisValue > 0.1 && axisValue < 0.3) {  // 0.14285719 = DOWN (soft drop like 'S')
                 dpadDown = true;
-                // console.log('🎮 DOWN detected! (soft drop like S key) axis 9 =', axes[9]);
             }
         }
         
-        // SEPARATE vertical axis (axis 10) for diagonal support
-        // This allows DOWN to work simultaneously with LEFT/RIGHT from axis 9
-        if (axes[10] !== undefined) {
-            if (axes[10] > 0.3) {
+        // SEPARATE vertical axis (axis 10) for diagonal support - preserved logic
+        if (axes[vAxis] !== undefined) {
+            if (axes[vAxis] > 0.3) {
                 dpadDown = true;
-                // console.log('🎮 DOWN detected from axis 10! value =', axes[10]);
             }
-            if (axes[10] < -0.3) {
+            if (axes[vAxis] < -0.3) {
                 dpadUp = true;
-                // console.log('🎮 UP detected from axis 10! value =', axes[10]);
             }
         }
         
         // Update last known axes values
-        this.lastGamepadAxes[9] = axes[9] || 0;
-        this.lastGamepadAxes[10] = axes[10] || 0;
+        this.lastGamepadAxes[hAxis] = axes[hAxis] || 0;
+        this.lastGamepadAxes[vAxis] = axes[vAxis] || 0;
+        
+        // Process button and movement inputs
+        this.processGamepadInputs(currentState, { dpadLeft, dpadRight, dpadUp, dpadDown });
+    }
+    
+    // 8BitDo SN30 Pro and fallback controller update
+    update8BitDoGamepad(gamepad) {
+        const buttons = gamepad.buttons;
+        const axes = gamepad.axes;
+        const config = this.currentControllerConfig;
+        
+        // Debug logging for gamepad inputs (commented out to reduce noise)
+        // if (Math.random() < 0.02) { // Log occasionally to avoid spam
+        //     console.log('🎮 8BitDo Gamepad Debug:');
+        //     console.log('Buttons:', gamepad.buttons.map((btn, i) => btn.pressed ? `${i}:pressed` : null).filter(x => x));
+        //     console.log('Axes:', gamepad.axes.map((axis, i) => Math.abs(axis) > 0.05 ? `${i}:${axis.toFixed(2)}` : null).filter(x => x));
+        // }
+        
+        const currentState = {};
+        
+        // Track button states
+        for (let i = 0; i < buttons.length; i++) {
+            currentState[i] = buttons[i].pressed;
+        }
+        
+        // D-pad detection
+        let dpadLeft = false, dpadRight = false, dpadUp = false, dpadDown = false;
+        
+        // Standard D-pad button detection first
+        if (buttons[config.dpad.buttons.up] && buttons[config.dpad.buttons.up].pressed) {
+            dpadUp = true;
+        }
+        if (buttons[config.dpad.buttons.down] && buttons[config.dpad.buttons.down].pressed) {
+            dpadDown = true;
+        }
+        if (buttons[config.dpad.buttons.left] && buttons[config.dpad.buttons.left].pressed) {
+            dpadLeft = true;
+        }
+        if (buttons[config.dpad.buttons.right] && buttons[config.dpad.buttons.right].pressed) {
+            dpadRight = true;
+        }
+        
+        // Analog stick detection for 8BitDo
+        const hAxis = config.dpad.axes.horizontal;
+        const vAxis = config.dpad.axes.vertical;
+        
+        if (axes[hAxis] !== undefined) {
+            const axisValue = axes[hAxis];
+            if (axisValue < config.dpad.axisMapping.left.max) {
+                dpadLeft = true;
+            } else if (axisValue > config.dpad.axisMapping.right.min) {
+                dpadRight = true;
+            }
+        }
+        
+        if (axes[vAxis] !== undefined) {
+            const axisValue = axes[vAxis];
+            if (axisValue > config.dpad.verticalAxis.down.min) {
+                dpadDown = true;
+            } else if (axisValue < config.dpad.verticalAxis.up.min) {
+                dpadUp = true;
+            }
+        }
+        
+        // Process button and movement inputs
+        this.processGamepadInputs(currentState, { dpadLeft, dpadRight, dpadUp, dpadDown });
+    }
+    
+    // Common gamepad input processing for all controller types
+    processGamepadInputs(currentState, dpadState) {
+        const config = this.currentControllerConfig;
+        const { dpadLeft, dpadRight, dpadUp, dpadDown } = dpadState;
         
         // Only trigger on button press (not hold)
         const wasPressed = (buttonIndex) => {
@@ -1620,14 +1788,14 @@ class BlocksGame {
         };
         
         if (!this.gameOver && !this.paused) {
-            // Rotation controls
-            if (wasPressed(1) || wasPressed(5)) { // A or R shoulder = CW
+            // Rotation controls - check all configured buttons
+            if (config.buttons.rotateCW.some(btn => wasPressed(btn))) {
                 this.rotatePiece(1);
             }
-            if (wasPressed(0) || wasPressed(4)) { // B or L shoulder = CCW  
+            if (config.buttons.rotateCCW.some(btn => wasPressed(btn))) {
                 this.rotatePiece(-1);
             }
-            if (wasPressed(2) || wasPressed(3)) { // Y or X = 180°
+            if (config.buttons.rotate180.some(btn => wasPressed(btn))) {
                 this.rotatePiece(2);
             }
             
@@ -1635,29 +1803,27 @@ class BlocksGame {
             const now = Date.now();
             this.handleGamepadMovement('left', dpadLeft, -1, now);
             this.handleGamepadMovement('right', dpadRight, 1, now);
+            
             // Handle down button like keyboard 'S' key - change drop speed
             if (dpadDown && !this.gamepadDownPressed) {
-                // console.log('🎮 D-pad Down pressed - speeding up drop!');
                 this.gamepadDownPressed = true;
                 this.originalDropSpeed = this.dropSpeed; // Store current drop speed
                 this.dropSpeed = 50; // Fast drop speed same as keyboard 'S'
             } else if (!dpadDown && this.gamepadDownPressed) {
-                // console.log('🎮 D-pad Down released - restoring normal drop speed!');
                 this.gamepadDownPressed = false;
                 this.dropSpeed = this.originalDropSpeed; // Restore original speed
                 this.calculateDropSpeed(); // Recalculate proper speed for current level
             }
+            
             if (dpadUp) { // D-pad Up (hard drop)
-                // console.log('🎮 D-pad Up detected!');
                 this.hardDrop();
             }
         }
         
-        // Pause toggle (during game)
-        if (wasPressed(9)) { // Start button
+        // Pause toggle (during game) - check all configured pause buttons
+        if (config.buttons.pause.some(btn => wasPressed(btn))) {
             if (this.gameOver) {
                 // If game is over, start button restarts the game
-                // console.log('🎮 Start button pressed - restarting game!');
                 this.newGame();
             } else {
                 // During game, start button pauses/unpauses
